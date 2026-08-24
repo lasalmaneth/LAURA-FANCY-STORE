@@ -1,0 +1,122 @@
+/* ─────────────────────────────────────────
+   LAYOUT — Navigation · Ticker
+───────────────────────────────────────── */
+
+/* ── NAVBAR ── */
+
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  border-bottom: var(--border-thin);
+  background: rgba(245, 244, 240, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: padding 0.3s ease;
+}
+
+.nav.scrolled { padding: 14px 48px; }
+
+/* Logo */
+.nav__logo  { display: flex; align-items: center; }
+
+.nav__logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.nav__logo-img {
+  height: 56px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.logo-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 0.15em;
+}
+
+.logo-sub {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--grey);
+}
+
+/* Links */
+.nav__links { display: flex; gap: 36px; }
+
+.nav__links a {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.nav__links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.nav__links a:hover::after { transform: scaleX(1); }
+
+/* Burger */
+.nav__burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.nav__burger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--ink);
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+/* ── TICKER ── */
+
+.ticker {
+  margin-top: 73px;
+  overflow: hidden;
+  background: var(--ink);
+  border-bottom: var(--border-thin);
+  padding: 10px 0;
+}
+
+.ticker__track {
+  display: flex;
+  gap: 32px;
+  white-space: nowrap;
+  animation: ticker 25s linear infinite;
+}
+
+.ticker__track span {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--paper);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}

@@ -1,0 +1,59 @@
+/* ─────────────────────────────────────────
+   BASE — Variables · Reset · Typography
+   Note: Google Fonts loaded via <link> in index.html
+───────────────────────────────────────── */
+
+/* ── CSS DESIGN TOKENS ── */
+:root {
+  --ink:         #0a0a0a;
+  --paper:       #f5f4f0;
+  --paper-warm:  #eeece5;
+  --paper-mid:   #e0ddd4;
+  --grey:        #888;
+  --grey-light:  #ccc;
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'Space Mono', monospace;
+  --font-hand:    'Special Elite', cursive;
+
+  --border:      2px solid var(--ink);
+  --border-thin: 1px solid var(--ink);
+  --transition:  0.2s ease;
+}
+
+/* ── RESET ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── BASE ── */
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── TYPOGRAPHY ── */
+h1, h2, h3 { font-weight: 700; line-height: 1.1; }
+a  { color: var(--ink); text-decoration: none; }
+p  { font-size: 13px; line-height: 1.75; }
+::selection { background: var(--ink); color: var(--paper); }
+
+/* ── NOISE TEXTURE OVERLAY ── */
+.noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
