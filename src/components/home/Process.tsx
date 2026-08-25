@@ -195,10 +195,9 @@ const STEPS = [
     number: "01",
     IconComponent: BrowseSelectIcon,
     title: "BROWSE & SELECT",
-    description: "Explore curated daily needs across top categories. Pick your items easily in seconds.",
+    description: "Explore curated daily needs across top categories. Pick your items easily in seconds and send us a whatsapp message.",
     glowColor: "group-hover:border-amber-400/40 group-hover:shadow-[0_0_35px_rgba(245,158,11,0.22)]",
     iconBg: "group-hover:bg-amber-500/20 group-hover:border-amber-400/50",
-    badgeText: "Curated Catalog",
   },
   {
     number: "02",
@@ -207,7 +206,6 @@ const STEPS = [
     description: "Every item undergoes multi-point inspection to ensure perfection before packaging.",
     glowColor: "group-hover:border-emerald-400/40 group-hover:shadow-[0_0_35px_rgba(16,185,129,0.22)]",
     iconBg: "group-hover:bg-emerald-500/20 group-hover:border-emerald-400/50",
-    badgeText: "100% Inspected",
   },
   {
     number: "03",
@@ -216,7 +214,6 @@ const STEPS = [
     description: "Packed securely in protective packaging and dispatched rapidly within 24 hours.",
     glowColor: "group-hover:border-blue-400/40 group-hover:shadow-[0_0_35px_rgba(59,130,246,0.22)]",
     iconBg: "group-hover:bg-blue-500/20 group-hover:border-blue-400/50",
-    badgeText: "< 24h Dispatch",
   },
   {
     number: "04",
@@ -225,7 +222,6 @@ const STEPS = [
     description: "Safe, reliable delivery right to your door with live tracking & dedicated customer support.",
     glowColor: "group-hover:border-purple-400/40 group-hover:shadow-[0_0_35px_rgba(168,85,247,0.22)]",
     iconBg: "group-hover:bg-purple-500/20 group-hover:border-purple-400/50",
-    badgeText: "Live Tracking",
   },
 ];
 
@@ -258,9 +254,6 @@ export default function Process() {
                 <div className="flex items-center justify-between mb-8">
                   <span className="font-display text-5xl text-paper/20 group-hover:text-paper/50 transition-colors duration-300">
                     {step.number}
-                  </span>
-                  <span className="text-[10px] font-mono tracking-widest uppercase px-2.5 py-1 rounded-full border border-paper/10 bg-paper/5 text-paper/60 group-hover:border-paper/30 group-hover:text-paper transition-all">
-                    {step.badgeText}
                   </span>
                 </div>
 
