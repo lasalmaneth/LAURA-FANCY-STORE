@@ -39,14 +39,6 @@ export default function LogoSplashOverlay() {
         fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
-      {/* Skip Button */}
-      <button
-        onClick={handleEnd}
-        className="absolute top-6 right-6 z-10 px-5 py-2 border border-white/30 text-white/80 hover:text-white hover:border-white font-mono text-xs tracking-widest uppercase transition-all bg-black/40 backdrop-blur-md"
-      >
-        Skip Intro →
-      </button>
-
       {/* Fullscreen Video Player */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <video
