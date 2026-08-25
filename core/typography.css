@@ -1,0 +1,33 @@
+/* ─────────────────────────────────────────
+   CORE — Typography
+   Body, headings, links, paragraphs.
+───────────────────────────────────────── */
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+p {
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}

@@ -1,0 +1,27 @@
+/* ─────────────────────────────────────────
+   CORE — Design Tokens
+   Single source of truth for all design values.
+   Never modify directly in service files.
+───────────────────────────────────────── */
+
+:root {
+  /* ── Colour Palette ── */
+  --ink:        #0a0a0a;
+  --paper:      #f5f4f0;
+  --paper-warm: #eeece5;
+  --paper-mid:  #e0ddd4;
+  --grey:       #888;
+  --grey-light: #ccc;
+
+  /* ── Typography ── */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'Space Mono', monospace;
+  --font-hand:    'Special Elite', cursive;
+
+  /* ── Borders ── */
+  --border:      2px solid var(--ink);
+  --border-thin: 1px solid var(--ink);
+
+  /* ── Motion ── */
+  --transition: 0.2s ease;
+}

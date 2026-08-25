@@ -1,0 +1,98 @@
+/* ── Products Service ────────────────────── */
+
+.products { padding: 96px 0; border-bottom: var(--border); }
+
+.products__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: var(--border-thin);
+  margin: 0 48px;
+}
+
+.product-card {
+  border-right: var(--border-thin);
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s;
+  position: relative;
+}
+.product-card:last-child  { border-right: none; }
+.product-card:hover       { background: var(--paper-warm); }
+
+/* Featured (inverted) */
+.product-card.featured                      { background: var(--ink); color: var(--paper); }
+.product-card.featured:hover                { background: #111; }
+.product-card.featured .product-card__num   { color: rgba(245,244,240,0.08); }
+.product-card.featured .product-card__price { color: var(--paper); }
+.product-card.featured .product-card__desc  { color: rgba(245,244,240,0.6); }
+.product-card.featured .product-card__body  { border-top-color: rgba(245,244,240,0.3); }
+.product-card.featured .btn--sm             { border-color: var(--paper); color: var(--paper); }
+.product-card.featured .btn--sm:hover       { background: var(--paper); color: var(--ink); }
+
+.product-card__badge {
+  position: absolute;
+  top: 16px; right: 16px;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  padding: 4px 10px;
+  border: 1px solid var(--paper);
+  color: var(--paper);
+}
+
+.product-card__img {
+  padding: 48px 40px 24px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+}
+
+.product-sketch.small     { width: 130px; height: 130px; }
+.product-sketch.small svg { width: 100%; height: 100%; }
+
+.product-card__num {
+  position: absolute;
+  bottom: 12px; right: 20px;
+  font-family: var(--font-display);
+  font-size: 40px;
+  color: rgba(10,10,10,0.08);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.product-card__body {
+  padding: 0 40px 40px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  border-top: var(--border-thin);
+}
+
+.product-card__name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.05em;
+  padding-top: 20px;
+  margin-bottom: 10px;
+}
+
+.product-card__desc {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--grey);
+  flex: 1;
+  margin-bottom: 24px;
+}
+
+.product-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.product-card__price {
+  font-family: var(--font-display);
+  font-size: 24px;
+  letter-spacing: 0.05em;
+}

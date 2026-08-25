@@ -1,0 +1,72 @@
+/* ── Story Service ───────────────────────── */
+
+.story { padding: 96px 48px; border-bottom: var(--border); }
+
+.story__wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.story__left .section-tag   { margin-bottom: 4px; }
+.story__left .section-title { margin-bottom: 32px; }
+
+.story__body p { margin-bottom: 20px; color: #333; }
+
+.story__sig { margin-top: 36px; border-top: var(--border-thin); padding-top: 20px; }
+
+.sig-line { font-family: var(--font-hand); font-size: 20px; margin-bottom: 4px; }
+
+.sig-sub  { font-size: 10px; letter-spacing: 0.2em; color: var(--grey); text-transform: uppercase; }
+
+.story__right { position: relative; }
+
+.story__collage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  position: relative;
+}
+
+.collage-card {
+  border: var(--border-thin);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--paper-warm);
+  transition: background 0.2s, transform 0.15s;
+  cursor: default;
+}
+.collage-card:hover               { background: var(--ink); transform: translate(-2px, -2px); }
+.collage-card:hover .collage-text { color: var(--paper); }
+
+.collage-icon { font-size: 24px; }
+
+.collage-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.story__big-num {
+  position: absolute;
+  bottom: -20px; right: -10px;
+  font-family: var(--font-display);
+  font-size: 120px;
+  color: rgba(10,10,10,0.06);
+  line-height: 1;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.story__years-label {
+  text-align: right;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--grey);
+  text-transform: uppercase;
+  margin-top: 8px;
+}

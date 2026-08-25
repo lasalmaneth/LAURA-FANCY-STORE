@@ -1,0 +1,35 @@
+/* ── Features Service ────────────────────── */
+
+.features { border-bottom: var(--border); }
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.feature-item {
+  padding: 60px 40px;
+  border-right: var(--border-thin);
+  transition: background 0.2s;
+}
+.feature-item:last-child { border-right: none; }
+.feature-item:hover      { background: var(--ink); }
+.feature-item:hover .feat-title,
+.feature-item:hover .feat-desc,
+.feature-item:hover .feat-num { color: var(--paper); }
+
+.feat-num {
+  font-family: var(--font-display);
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: var(--grey-light);
+}
+
+.feat-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.feat-desc { font-size: 12px; line-height: 1.75; color: var(--grey); }

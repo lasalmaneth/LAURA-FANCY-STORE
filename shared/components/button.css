@@ -1,0 +1,47 @@
+/* ─────────────────────────────────────────
+   SHARED COMPONENT — Button
+   All variants. Services must not redefine buttons.
+───────────────────────────────────────── */
+
+.btn {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border: var(--border);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background var(--transition), color var(--transition), transform 0.1s;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.btn:hover::after { transform: scaleX(1); }
+.btn:active       { transform: scale(0.98); }
+
+/* ── Variants ── */
+
+.btn--primary        { background: var(--ink); color: var(--paper); }
+.btn--primary:hover  { background: var(--paper); color: var(--ink); }
+.btn--primary::after { background: var(--paper); }
+
+.btn--ghost          { background: transparent; color: var(--ink); }
+.btn--ghost:hover    { background: var(--ink); color: var(--paper); }
+
+.btn--sm             { padding: 8px 16px; font-size: 10px; background: transparent; color: var(--ink); }
+.btn--sm:hover       { background: var(--ink); color: var(--paper); }
+
+.btn--full           { width: 100%; text-align: center; }
