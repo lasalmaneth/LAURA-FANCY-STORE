@@ -12,7 +12,6 @@ const REVEAL_SELECTORS = [
   ".feature-item",
   ".contact__left",
   ".contact__right",
-  ".newsletter__inner",
 ];
 
 export default function ScrollObserver() {

@@ -4,7 +4,6 @@ import FeaturedProducts from "@/components/home/FeaturedProducts";
 import Story from "@/components/home/Story";
 import Process from "@/components/home/Process";
 import ContactSection from "@/components/home/ContactSection";
-import Newsletter from "@/components/home/Newsletter";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +32,6 @@ export default async function HomePage() {
       <Story />
       <Process />
       <ContactSection />
-      <Newsletter />
     </>
   );
 }
