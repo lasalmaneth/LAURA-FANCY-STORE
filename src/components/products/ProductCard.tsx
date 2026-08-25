@@ -22,22 +22,15 @@ export default function ProductCard({ product, index = 1 }: ProductCardProps) {
       }`}
       id={`product-${product.slug}`}
     >
-      {isFeatured && (
-        <div className="absolute top-4 right-4 text-[9px] tracking-[0.2em] px-2.5 py-1 border border-paper text-paper">
-          BESTSELLER
-        </div>
-      )}
-
-      <div className="p-10 pb-6 relative flex items-center justify-center min-h-[220px]">
+      <div className="relative w-full aspect-[4/3] overflow-hidden flex items-center justify-center border-b border-ink/20">
         {mainImage ? (
-          <div className="relative w-full h-44">
-            <Image
-              src={mainImage}
-              alt={product.name}
-              fill
-              className="object-contain"
-            />
-          </div>
+          <Image
+            src={mainImage}
+            alt={product.name}
+            fill
+            className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+            priority
+          />
         ) : (
           <div className="w-[130px] h-[130px] flex items-center justify-center">
             <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" aria-hidden="true">
@@ -55,9 +48,14 @@ export default function ProductCard({ product, index = 1 }: ProductCardProps) {
             </svg>
           </div>
         )}
+        {isFeatured && (
+          <div className="absolute top-4 right-4 text-[9px] tracking-[0.2em] px-2.5 py-1 border border-paper bg-ink/80 text-paper z-10 backdrop-blur-sm">
+            BESTSELLER
+          </div>
+        )}
         <div
-          className={`absolute bottom-3 right-5 font-display text-4xl pointer-events-none select-none ${
-            isFeatured ? "text-paper/10" : "text-ink/10"
+          className={`absolute bottom-3 right-5 font-display text-4xl pointer-events-none select-none z-10 ${
+            mainImage ? "text-white/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : isFeatured ? "text-paper/10" : "text-ink/10"
           }`}
         >
           {numStr}

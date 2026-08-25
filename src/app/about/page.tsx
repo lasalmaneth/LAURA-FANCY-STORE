@@ -1,6 +1,5 @@
 import Story from "@/components/home/Story";
 import Process from "@/components/home/Process";
-import Features from "@/components/home/Features";
 
 export const metadata = {
   title: "About Our Store — Laura Fancy Store",
@@ -12,7 +11,6 @@ export default function AboutPage() {
     <div className="pt-20">
       <Story />
       <Process />
-      <Features />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import NoiseOverlay from "@/components/layout/NoiseOverlay";
 import CustomCursor from "@/components/layout/CustomCursor";
 import ScrollObserver from "@/components/layout/ScrollObserver";
+import LogoSplashOverlay from "@/components/layout/LogoSplashOverlay";
 
 const bebas = Bebas_Neue({
   weight: "400",
@@ -39,6 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${bebas.variable} ${spaceMono.variable} ${specialElite.variable}`}>
       <body className="antialiased bg-paper text-ink selection:bg-ink selection:text-paper min-h-screen flex flex-col">
+        <LogoSplashOverlay />
         <NoiseOverlay />
         <CustomCursor />
         <ScrollObserver />
