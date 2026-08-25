@@ -7,6 +7,31 @@ import WhatsAppButton from "@/components/products/WhatsAppButton";
 import { Product } from "@/lib/types";
 
 const FALLBACK_PRODUCTS: Record<string, Product> = {
+  "sage-green-vacuum-flask-set": {
+    id: "1",
+    name: "SAGE GREEN VACUUM FLASK SET",
+    slug: "sage-green-vacuum-flask-set",
+    description: "Embrace the everyday with your sage green travel companion. A complete set for all your hot or cold drinks. Keep them at temperature, wherever life takes you. Features double-wall stainless steel insulation, leakproof lid, matching travel mugs, and premium gift box packaging.",
+    short_description: "Sage Green Travel Companion. Complete hot & cold vacuum flask set with matching cups.",
+    price: 35,
+    category_id: "cat-1",
+    product_code: "LFS-100",
+    stock_status: "in_stock",
+    featured: true,
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    images: [
+      {
+        id: "img-1",
+        product_id: "1",
+        image_url: "/assets/images/vacuum-flask-set.jpg",
+        storage_path: "assets/images/vacuum-flask-set.jpg",
+        sort_order: 1,
+        created_at: new Date().toISOString(),
+      },
+    ],
+  },
   "insulated-stainless-water-bottle": {
     id: "1",
     name: "INSULATED STAINLESS WATER BOTTLE",
