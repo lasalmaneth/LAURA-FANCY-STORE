@@ -99,7 +99,7 @@ export default function ProductQuickViewModal({
 
             <div className="flex items-center gap-3 mb-4">
               <span className="font-display text-3xl text-ink font-bold">
-                ${product.price}
+                Rs. {product.price.toLocaleString('en-US')}
               </span>
               <span className="text-[10px] font-mono tracking-widest uppercase px-2.5 py-0.5 border border-ink bg-ink text-paper font-bold rounded">
                 {product.stock_status === "in_stock" ? "In Stock" : "Available"}

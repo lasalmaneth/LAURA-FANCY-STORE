@@ -54,7 +54,7 @@ export default function ProductTable({ initialProducts }: ProductTableProps) {
             <tr key={p.id} className="hover:bg-paper-warm transition-colors">
               <td className="p-4 font-bold text-grey">{p.product_code || "—"}</td>
               <td className="p-4 font-bold">{p.name}</td>
-              <td className="p-4">${p.price}</td>
+              <td className="p-4">Rs. {p.price.toLocaleString('en-US')}</td>
               <td className="p-4 uppercase">{p.stock_status.replace(/_/g, " ")}</td>
               <td className="p-4">
                 <button

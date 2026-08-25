@@ -13,7 +13,7 @@ const FALLBACK_PRODUCTS: Record<string, Product> = {
     slug: "sage-green-vacuum-flask-set",
     description: "Embrace the everyday with your sage green travel companion. A complete set for all your hot or cold drinks. Keep them at temperature, wherever life takes you. Features double-wall stainless steel insulation, leakproof lid, matching travel mugs, and premium gift box packaging.",
     short_description: "Sage Green Travel Companion. Complete hot & cold vacuum flask set with matching cups.",
-    price: 35,
+    price: 1200,
     category_id: "cat-1",
     product_code: "LFS-100",
     stock_status: "in_stock",
@@ -38,7 +38,7 @@ const FALLBACK_PRODUCTS: Record<string, Product> = {
     slug: "insulated-stainless-water-bottle",
     description: "Double-wall insulated stainless steel bottle designed for daily hydration. Features a leakproof vacuum-sealed lid, non-slip base, and keeps beverages cold for up to 24 hours or hot for 12 hours.",
     short_description: "Double-wall insulated stainless steel bottle. Keeps drinks cold for 24h.",
-    price: 28,
+    price: 1200,
     category_id: "cat-1",
     product_code: "LFS-101",
     stock_status: "in_stock",
@@ -53,7 +53,7 @@ const FALLBACK_PRODUCTS: Record<string, Product> = {
     slug: "wireless-noise-canceling-earbuds",
     description: "High-fidelity audio with active noise cancellation and ambient sound mode. Ergonomic lightweight fit, IPX5 water resistance, touch controls, and up to 30 hours of playback with the wireless charging case.",
     short_description: "Active noise cancellation, touch controls, and 30h total battery life.",
-    price: 79,
+    price: 2990,
     category_id: "cat-2",
     product_code: "LFS-102",
     stock_status: "in_stock",
@@ -194,7 +194,7 @@ export default async function ProductDetailPage({
             {product.name}
           </h1>
 
-          <div className="font-display text-3xl sm:text-4xl mb-6">${product.price}</div>
+          <div className="font-display text-3xl sm:text-4xl mb-6">Rs. {product.price.toLocaleString('en-US')}</div>
 
           <div className="w-full h-[1px] bg-ink/20 mb-6" />
 

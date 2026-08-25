@@ -16,7 +16,7 @@ export function generateWhatsAppLink({
 
   let message = `Hi, I'm interested in this product.\n`;
   message += `Product: ${productName}\n`;
-  message += `Price: $${price.toLocaleString('en-US')}\n`;
+  message += `Price: Rs. ${price.toLocaleString('en-US')}\n`;
   
   if (productCode) {
     message += `Product Code: ${productCode}\n`;

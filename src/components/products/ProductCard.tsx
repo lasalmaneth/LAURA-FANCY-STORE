@@ -101,7 +101,7 @@ export default function ProductCard({ product, index = 1 }: ProductCardProps) {
 
           <div className="flex items-center justify-between mt-auto pt-2">
             <span className="font-display text-2xl tracking-wide">
-              ${product.price}
+              Rs. {product.price.toLocaleString('en-US')}
             </span>
             <WhatsAppButton
               productName={product.name}

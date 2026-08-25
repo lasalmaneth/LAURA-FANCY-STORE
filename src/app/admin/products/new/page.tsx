@@ -59,7 +59,7 @@ export default function NewProductPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] tracking-[0.2em] font-bold uppercase text-grey">
-              PRICE ($) *
+              PRICE (Rs.) *
             </label>
             <input
               type="number"
