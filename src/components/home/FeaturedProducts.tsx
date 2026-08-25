@@ -4,28 +4,28 @@ import ProductCard from "../products/ProductCard";
 const FALLBACK_PRODUCTS: Product[] = [
   {
     id: "1",
-    name: "OAK SIDE CHAIR",
-    slug: "oak-side-chair",
-    description: "Solid white oak. Hand-planed, hand-oiled. Each chair unique in grain.",
-    short_description: "Solid white oak. Hand-planed, hand-oiled. Each chair unique in grain.",
-    price: 485,
+    name: "INSULATED STAINLESS WATER BOTTLE",
+    slug: "insulated-stainless-water-bottle",
+    description: "Double-wall insulated stainless steel bottle. Keeps drinks cold for 24h, leakproof cap.",
+    short_description: "Double-wall insulated stainless steel bottle. Keeps drinks cold for 24h.",
+    price: 28,
     category_id: "cat-1",
-    product_code: "LFS-001",
+    product_code: "LFS-101",
     stock_status: "in_stock",
-    featured: false,
+    featured: true,
     active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
     id: "2",
-    name: "DINING TABLE",
-    slug: "dining-table",
-    description: "Reclaimed pine with dovetail joinery. Seats 6 comfortably. Heirloom quality.",
-    short_description: "Reclaimed pine with dovetail joinery. Seats 6 comfortably. Heirloom quality.",
-    price: 1240,
+    name: "WIRELESS NOISE-CANCELING EARBUDS",
+    slug: "wireless-noise-canceling-earbuds",
+    description: "Crystal clear sound with active noise cancellation, touch controls, and 30-hour battery life.",
+    short_description: "Active noise cancellation, touch controls, and 30h total battery life.",
+    price: 79,
     category_id: "cat-2",
-    product_code: "LFS-002",
+    product_code: "LFS-102",
     stock_status: "in_stock",
     featured: true,
     active: true,
@@ -34,15 +34,15 @@ const FALLBACK_PRODUCTS: Product[] = [
   },
   {
     id: "3",
-    name: "WALL SHELF UNIT",
-    slug: "wall-shelf-unit",
-    description: "Three-tier solid ash. Minimal brackets, maximum character.",
-    short_description: "Three-tier solid ash. Minimal brackets, maximum character.",
-    price: 320,
+    name: "MINIMALIST CANVAS EVERYDAY TOTE",
+    slug: "minimalist-canvas-everyday-tote",
+    description: "Heavyweight organic cotton canvas tote with interior zip pocket for laptop and daily essentials.",
+    short_description: "Heavyweight organic cotton tote bag for daily errands and work.",
+    price: 35,
     category_id: "cat-3",
-    product_code: "LFS-003",
+    product_code: "LFS-103",
     stock_status: "in_stock",
-    featured: false,
+    featured: true,
     active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -60,7 +60,7 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
     <section className="py-24 border-b border-ink" id="products">
       <div className="section-header">
         <span className="section-tag">// 01</span>
-        <h2 className="section-title">THE COLLECTION</h2>
+        <h2 className="section-title">FEATURED ESSENTIALS</h2>
         <div className="section-line" />
       </div>
 

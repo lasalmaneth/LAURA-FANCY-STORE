@@ -4,48 +4,48 @@ export default function Story() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div className="story__left">
           <span className="section-tag">// 02</span>
-          <h2 className="section-title mb-8">OUR STORY</h2>
+          <h2 className="section-title mb-8">ABOUT LAURA FANCY STORE</h2>
           <div className="space-y-5 text-[#333]">
             <p>
-              We started in a small garage in 2019 with a single workbench, a few hand tools, and an obsession with things that last.
+              Laura Fancy Store is your ultimate online shopping destination, created to bring high-quality everyday essentials and customer needs right to your doorstep.
             </p>
             <p>
-              No algorithms. No assembly lines. Every piece passes through human hands from raw timber to finished object. We work with local mills, choose materials that age well, and refuse to rush.
+              We source directly from trusted manufacturers to cut out middleman markups. From daily household goods and personal accessories to smart lifestyle essentials, every product in our catalog is handpicked for quality, utility, and modern style.
             </p>
             <p>
-              The marks you see — small tool lines, grain variation, the slight unevenness in a joint — these aren't flaws. They're proof.
+              Our promise is simple: fair prices, transparent service, fast order dispatch, and 100% customer satisfaction on every order you make with us.
             </p>
           </div>
           <div className="mt-9 pt-5 border-t border-ink">
-            <div className="font-hand text-xl mb-1">— Marcus &amp; Elena</div>
-            <div className="text-[10px] tracking-[0.2em] text-grey uppercase">Founders, Laura Fancy Store</div>
+            <div className="font-hand text-xl mb-1">— Laura Fancy Store Team</div>
+            <div className="text-[10px] tracking-[0.2em] text-grey uppercase">Your Trusted Everyday Shopping Partner</div>
           </div>
         </div>
 
         <div className="relative story__right">
           <div className="grid grid-cols-2 gap-3 relative">
             <div className="border border-ink p-6 flex flex-col gap-2.5 bg-paper-warm hover:bg-ink hover:text-paper group transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 cursor-default">
-              <div className="text-2xl">⚒</div>
-              <div className="text-[11px] font-bold tracking-wider uppercase">Hand tools only</div>
+              <div className="text-2xl">🛍</div>
+              <div className="text-[11px] font-bold tracking-wider uppercase">100% Authentic</div>
             </div>
             <div className="border border-ink p-6 flex flex-col gap-2.5 bg-paper-warm hover:bg-ink hover:text-paper group transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 cursor-default">
-              <div className="text-2xl">🌲</div>
-              <div className="text-[11px] font-bold tracking-wider uppercase">Local timber</div>
+              <div className="text-2xl">⚡</div>
+              <div className="text-[11px] font-bold tracking-wider uppercase">Express Shipping</div>
             </div>
             <div className="border border-ink p-6 flex flex-col gap-2.5 bg-paper-warm hover:bg-ink hover:text-paper group transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 cursor-default">
-              <div className="text-2xl">⏱</div>
-              <div className="text-[11px] font-bold tracking-wider uppercase">Avg 40hrs / piece</div>
+              <div className="text-2xl">🏷</div>
+              <div className="text-[11px] font-bold tracking-wider uppercase">Best Daily Prices</div>
             </div>
             <div className="border border-ink p-6 flex flex-col gap-2.5 bg-paper-warm hover:bg-ink hover:text-paper group transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 cursor-default">
-              <div className="text-2xl">🤝</div>
-              <div className="text-[11px] font-bold tracking-wider uppercase">Small batch</div>
+              <div className="text-2xl">😊</div>
+              <div className="text-[11px] font-bold tracking-wider uppercase">Customer Support</div>
             </div>
             <div className="absolute -bottom-5 -right-2 font-display text-[120px] text-ink/[0.06] leading-none pointer-events-none select-none z-0">
-              07
+              24/7
             </div>
           </div>
           <div className="text-right text-[10px] tracking-[0.2em] text-grey uppercase mt-2">
-            years of craft
+            Everyday Customer Store
           </div>
         </div>
       </div>

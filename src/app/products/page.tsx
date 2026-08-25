@@ -6,35 +6,35 @@ import { Product, Category } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Collection — Laura Fancy Store",
-  description: "Browse our handcrafted boutique collection of furniture and objects.",
+  title: "Online Store Catalog — Laura Fancy Store",
+  description: "Shop everyday customer needs, gadgets, fashion, home essentials, and lifestyle products.",
 };
 
 const FALLBACK_PRODUCTS: Product[] = [
   {
     id: "1",
-    name: "OAK SIDE CHAIR",
-    slug: "oak-side-chair",
-    description: "Solid white oak. Hand-planed, hand-oiled. Each chair unique in grain.",
-    short_description: "Solid white oak. Hand-planed, hand-oiled. Each chair unique in grain.",
-    price: 485,
+    name: "INSULATED STAINLESS WATER BOTTLE",
+    slug: "insulated-stainless-water-bottle",
+    description: "Double-wall insulated stainless steel bottle. Keeps drinks cold for 24h, leakproof cap.",
+    short_description: "Double-wall insulated stainless steel bottle. Keeps drinks cold for 24h.",
+    price: 28,
     category_id: "cat-1",
-    product_code: "LFS-001",
+    product_code: "LFS-101",
     stock_status: "in_stock",
-    featured: false,
+    featured: true,
     active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
     id: "2",
-    name: "DINING TABLE",
-    slug: "dining-table",
-    description: "Reclaimed pine with dovetail joinery. Seats 6 comfortably. Heirloom quality.",
-    short_description: "Reclaimed pine with dovetail joinery. Seats 6 comfortably. Heirloom quality.",
-    price: 1240,
+    name: "WIRELESS NOISE-CANCELING EARBUDS",
+    slug: "wireless-noise-canceling-earbuds",
+    description: "Crystal clear sound with active noise cancellation, touch controls, and 30-hour battery life.",
+    short_description: "Active noise cancellation, touch controls, and 30h total battery life.",
+    price: 79,
     category_id: "cat-2",
-    product_code: "LFS-002",
+    product_code: "LFS-102",
     stock_status: "in_stock",
     featured: true,
     active: true,
@@ -43,13 +43,43 @@ const FALLBACK_PRODUCTS: Product[] = [
   },
   {
     id: "3",
-    name: "WALL SHELF UNIT",
-    slug: "wall-shelf-unit",
-    description: "Three-tier solid ash. Minimal brackets, maximum character.",
-    short_description: "Three-tier solid ash. Minimal brackets, maximum character.",
-    price: 320,
+    name: "MINIMALIST CANVAS EVERYDAY TOTE",
+    slug: "minimalist-canvas-everyday-tote",
+    description: "Heavyweight organic cotton canvas tote with interior zip pocket for laptop and daily essentials.",
+    short_description: "Heavyweight organic cotton tote bag for daily errands and work.",
+    price: 35,
     category_id: "cat-3",
-    product_code: "LFS-003",
+    product_code: "LFS-103",
+    stock_status: "in_stock",
+    featured: true,
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "4",
+    name: "SMART AMBIENT DESK LAMP",
+    slug: "smart-ambient-desk-lamp",
+    description: "Touch-controlled LED lamp with adjustable brightness, color temperature, and wireless charging pad base.",
+    short_description: "Touch LED desk lamp with adjustable brightness and wireless phone charger.",
+    price: 49,
+    category_id: "cat-4",
+    product_code: "LFS-104",
+    stock_status: "in_stock",
+    featured: false,
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "5",
+    name: "ORGANIC SKINCARE HYDRATION SET",
+    slug: "organic-skincare-hydration-set",
+    description: "Gentle daily facial cleanser, hydrating serum, and lightweight moisturizer for healthy daily skin care.",
+    short_description: "3-piece organic daily skincare hydration set.",
+    price: 42,
+    category_id: "cat-5",
+    product_code: "LFS-105",
     stock_status: "in_stock",
     featured: false,
     active: true,
@@ -59,9 +89,11 @@ const FALLBACK_PRODUCTS: Product[] = [
 ];
 
 const FALLBACK_CATEGORIES: Category[] = [
-  { id: "cat-1", name: "Seating", slug: "seating", created_at: "", updated_at: "" },
-  { id: "cat-2", name: "Tables", slug: "tables", created_at: "", updated_at: "" },
-  { id: "cat-3", name: "Shelving", slug: "shelving", created_at: "", updated_at: "" },
+  { id: "cat-1", name: "Household & Living", slug: "household-living", created_at: "", updated_at: "" },
+  { id: "cat-2", name: "Electronics & Gadgets", slug: "electronics-gadgets", created_at: "", updated_at: "" },
+  { id: "cat-3", name: "Fashion & Accessories", slug: "fashion-accessories", created_at: "", updated_at: "" },
+  { id: "cat-4", name: "Home & Office", slug: "home-office", created_at: "", updated_at: "" },
+  { id: "cat-5", name: "Beauty & Care", slug: "beauty-care", created_at: "", updated_at: "" },
 ];
 
 export default async function ProductsCatalogPage({
@@ -112,9 +144,9 @@ export default async function ProductsCatalogPage({
     <div className="pt-28 pb-24 min-h-screen">
       <div className="px-6 md:px-12 mb-12">
         <span className="font-mono text-[10px] tracking-[0.2em] text-grey uppercase block mb-2">
-          // ARCHIVE CATALOG
+          // SHOP ALL PRODUCTS
         </span>
-        <h1 className="font-display text-5xl md:text-7xl tracking-wider">ALL PIECES</h1>
+        <h1 className="font-display text-5xl md:text-7xl tracking-wider">STORE CATALOG</h1>
         <div className="w-full h-[2px] bg-ink mt-4" />
       </div>
 

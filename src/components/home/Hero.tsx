@@ -17,78 +17,77 @@ export default function Hero() {
 
       {/* Left Column */}
       <div className="relative z-10 p-8 md:p-18 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-ink">
-        <div className="text-[10px] tracking-[0.25em] text-grey mb-6">
-          [ NEW COLLECTION — 2026 ]
+        <div className="text-[10px] tracking-[0.25em] text-grey mb-6 uppercase">
+          [ ONLINE SHOPPING STORE — DAILY ESSENTIALS ]
         </div>
-        <h1 className="font-display text-6xl sm:text-7xl lg:text-[100px] tracking-[0.02em] leading-[0.95] mb-7 relative after:content-[''] after:block after:w-20 after:h-1 after:bg-ink after:mt-5">
-          <span className="block">HAND</span>
-          <span className="block pl-6">CRAFTED.</span>
-          <span className="block">BUILT</span>
-          <span className="block pl-6">FOR USE.</span>
+        <h1 className="font-display text-6xl sm:text-7xl lg:text-[90px] tracking-[0.02em] leading-[0.95] mb-7 relative after:content-[''] after:block after:w-20 after:h-1 after:bg-ink after:mt-5">
+          <span className="block">EVERYDAY</span>
+          <span className="block pl-6">NEEDS.</span>
+          <span className="block">DELIVERED</span>
+          <span className="block pl-6">TO YOU.</span>
         </h1>
-        <p className="text-xs sm:text-sm leading-relaxed text-[#333] mb-9 max-w-[380px]">
-          Simple objects. Honest materials.<br />
-          Made by hand. No excess. Only function.
+        <p className="text-xs sm:text-sm leading-relaxed text-[#333] mb-9 max-w-[420px]">
+          Discover top-quality daily essentials, lifestyle products & trending goods.<br />
+          Curated for your everyday life with fast, reliable home delivery.
         </p>
         <div className="flex flex-wrap gap-4 items-center mb-12">
           <Link href="/products" className="btn btn--primary">
-            Explore Collection
+            Shop Catalog Now
           </Link>
           <Link href="/#story" className="btn btn--ghost">
-            Our Story →
+            About Our Store →
           </Link>
         </div>
         <div className="flex items-center border border-ink overflow-hidden w-fit">
           <div className="px-6 py-4 text-center hover:bg-ink hover:text-paper group transition-colors">
-            <span className="block font-display text-2xl leading-none group-hover:text-paper">247</span>
-            <span className="block text-[9px] tracking-[0.2em] text-grey uppercase mt-1 group-hover:text-paper">Pieces Made</span>
+            <span className="block font-display text-2xl leading-none group-hover:text-paper">10k+</span>
+            <span className="block text-[9px] tracking-[0.2em] text-grey uppercase mt-1 group-hover:text-paper">Orders Delivered</span>
           </div>
           <div className="w-[1px] bg-ink self-stretch" />
           <div className="px-6 py-4 text-center hover:bg-ink hover:text-paper group transition-colors">
             <span className="block font-display text-2xl leading-none group-hover:text-paper">100%</span>
-            <span className="block text-[9px] tracking-[0.2em] text-grey uppercase mt-1 group-hover:text-paper">By Hand</span>
+            <span className="block text-[9px] tracking-[0.2em] text-grey uppercase mt-1 group-hover:text-paper">Quality Checked</span>
           </div>
           <div className="w-[1px] bg-ink self-stretch" />
           <div className="px-6 py-4 text-center hover:bg-ink hover:text-paper group transition-colors">
-            <span className="block font-display text-2xl leading-none group-hover:text-paper">7yr</span>
-            <span className="block text-[9px] tracking-[0.2em] text-grey uppercase mt-1 group-hover:text-paper">Warranty</span>
+            <span className="block font-display text-2xl leading-none group-hover:text-paper">24/7</span>
+            <span className="block text-[9px] tracking-[0.2em] text-grey uppercase mt-1 group-hover:text-paper">Order Support</span>
           </div>
         </div>
       </div>
 
-      {/* Right Column — Technical SVG Sketch Panel */}
+      {/* Right Column — Shopping Experience Feature Card */}
       <div className="relative z-10 bg-paper-warm flex items-center justify-center p-8 sm:p-14 overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-[repeating-linear-gradient(0deg,transparent,transparent_28px,rgba(0,0,0,0.04)_28px,rgba(0,0,0,0.04)_29px)]">
-        <div className="relative w-full max-w-[360px] aspect-[1/1.1] border-2 border-ink bg-paper/50">
-          <div className="absolute top-2.5 left-3 font-hand text-xs text-grey pointer-events-none">solid oak</div>
-          <div className="absolute top-2.5 right-3 font-hand text-xs text-grey pointer-events-none">↗ visible grain</div>
-          <div className="w-full h-full flex items-center justify-center p-10">
-            <svg viewBox="0 0 400 420" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full max-w-[280px] animate-float" aria-hidden="true">
-              <g stroke="#111" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="120" y1="200" x2="105" y2="360" />
-                <line x1="280" y1="200" x2="295" y2="360" />
-                <line x1="130" y1="250" x2="118" y2="390" />
-                <line x1="270" y1="250" x2="282" y2="390" />
-                <path d="M110 240 Q200 220 290 240 Q285 260 200 265 Q115 260 110 240Z" />
-                <path d="M118 200 Q200 180 282 200 L280 200 Q200 188 120 200Z" />
-                <line x1="120" y1="200" x2="115" y2="240" />
-                <line x1="280" y1="200" x2="285" y2="240" />
-                <path d="M120 210 Q200 195 280 210" />
-                <path d="M119 225 Q200 210 281 225" />
-                <path d="M130 248 Q200 235 270 248" strokeWidth="1" strokeDasharray="4 3" />
-                <path d="M128 254 Q200 242 272 254" strokeWidth="1" strokeDasharray="4 3" />
-                <line x1="115" y1="300" x2="290" y2="310" strokeWidth="1.5" />
-                <line x1="55" y1="250" x2="108" y2="252" strokeWidth="1" strokeDasharray="3 3" />
-                <line x1="345" y1="248" x2="292" y2="252" strokeWidth="1" strokeDasharray="3 3" />
-              </g>
-              <circle cx="52" cy="250" r="3" fill="#111" />
-              <circle cx="348" cy="248" r="3" fill="#111" />
-              <line x1="105" y1="380" x2="285" y2="395" stroke="#111" strokeWidth="1" strokeDasharray="2 2" />
-              <text x="180" y="415" fontFamily="'Space Mono', monospace" fontSize="10" fill="#111">W: 62cm</text>
-              <text x="30" y="200" fontFamily="'Space Mono', monospace" fontSize="10" fill="#111" transform="rotate(-90 30 290)">H: 88cm</text>
-            </svg>
+        <div className="relative w-full max-w-[380px] border-2 border-ink bg-paper p-6 sm:p-8 flex flex-col gap-5 shadow-[6px_6px_0px_0px_#111]">
+          <div className="flex items-center justify-between border-b border-ink/10 pb-4">
+            <span className="font-mono text-[10px] tracking-widest text-grey uppercase">DAILY FEATURED DEALS</span>
+            <span className="bg-ink text-paper text-[9px] px-2 py-0.5 font-mono uppercase">In Stock</span>
           </div>
-          <div className="absolute bottom-2.5 right-3 font-hand text-xs text-grey pointer-events-none">hand-finished</div>
-          <div className="absolute bottom-2.5 left-3 font-hand text-xs text-grey italic">← draft 03</div>
+          
+          <div className="w-full aspect-[4/3] bg-paper-warm border border-ink flex items-center justify-center relative overflow-hidden">
+            <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-32 h-32 animate-float">
+              {/* Shopping Bag & Package Illustration */}
+              <rect x="45" y="50" width="110" height="90" rx="4" stroke="#111" strokeWidth="2.5" fill="#fcfbfa" />
+              <path d="M75 50 C75 25, 125 25, 125 50" stroke="#111" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+              <circle cx="100" cy="95" r="18" fill="#111" />
+              <path d="M93 95 L98 100 L108 90" stroke="#fcfbfa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <line x1="60" y1="120" x2="140" y2="120" stroke="#111" strokeWidth="1.5" strokeDasharray="3 3" />
+            </svg>
+            <div className="absolute top-2 right-2 font-mono text-[9px] bg-ink/10 px-2 py-0.5 uppercase">Express Dispatch</div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="font-mono text-xs text-grey uppercase tracking-wider">Laura Fancy Store</div>
+            <div className="font-display text-2xl tracking-wide">EVERYDAY CUSTOMER ESSENTIALS</div>
+            <p className="text-xs text-[#444] leading-relaxed">
+              Curated daily items engineered for convenience, durability, and unbeatable everyday value.
+            </p>
+          </div>
+
+          <div className="pt-3 border-t border-ink/10 flex items-center justify-between">
+            <span className="font-mono text-xs text-grey uppercase">Best Price Guaranteed</span>
+            <span className="font-display text-xl">100% Authentic</span>
+          </div>
         </div>
       </div>
     </section>

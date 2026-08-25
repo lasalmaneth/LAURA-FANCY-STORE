@@ -23,15 +23,18 @@ export default function Navbar() {
       }`}
     >
       <div className="flex items-center">
-        <Link href="/" className="flex items-center text-none">
+        <Link href="/" className="flex items-center gap-3 text-none group">
           <Image
             src="/assets/images/logo.png"
             alt="Laura Fancy Store"
             width={160}
             height={56}
-            className="h-14 w-auto object-contain block"
+            className="h-11 sm:h-13 w-auto object-contain block"
             priority
           />
+          <span className="font-display text-xl sm:text-2xl tracking-wider font-bold text-ink uppercase group-hover:opacity-80 transition-opacity">
+            LAURA FANCY STORE
+          </span>
         </Link>
       </div>
 

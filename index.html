@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Laura Fancy Store</title>
+  <title>Laura Fancy Store — Online Shopping Store</title>
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
-  <meta name="description" content="Simple objects. Honest materials. Made by hand. No excess. Only function." />
+  <meta name="description" content="Your trusted online shopping store for customer daily needs, trending gadgets, fashion, home essentials, and lifestyle products." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -30,8 +30,9 @@
   <!-- ───────────── NAVBAR ───────────── -->
   <header class="nav">
     <div class="nav__logo">
-      <a href="#" class="nav__logo-link">
+      <a href="#" class="nav__logo-link" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
         <img src="assets/images/logo.png" alt="Laura Fancy Store" class="nav__logo-img" />
+        <span style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 0.05em; color: #111; font-weight: bold; text-transform: uppercase;">LAURA FANCY STORE</span>
       </a>
     </div>
     <nav class="nav__links" id="nav-links">
@@ -48,16 +49,11 @@
   <!-- ───────────── TICKER ───────────── -->
   <div class="ticker" aria-hidden="true">
     <div class="ticker__track">
-      <span>HANDCRAFTED</span><span>✦</span>
-      <span>HONEST MATERIALS</span><span>✦</span>
-      <span>BUILT FOR USE</span><span>✦</span>
-      <span>NO EXCESS</span><span>✦</span>
-      <span>MADE BY HAND</span><span>✦</span>
-      <span>HANDCRAFTED</span><span>✦</span>
-      <span>HONEST MATERIALS</span><span>✦</span>
-      <span>BUILT FOR USE</span><span>✦</span>
-      <span>NO EXCESS</span><span>✦</span>
-      <span>MADE BY HAND</span><span>✦</span>
+      <span>EVERYDAY ESSENTIALS</span><span>✦</span>
+      <span>BEST PRICES</span><span>✦</span>
+      <span>FAST HOME DELIVERY</span><span>✦</span>
+      <span>100% QUALITY GUARANTEE</span><span>✦</span>
+      <span>NEW ARRIVALS DAILY</span><span>✦</span>
     </div>
   </div>
 
@@ -367,59 +363,18 @@
   </section>
 
   <!-- ───────────── CONTACT / CTA ───────────── -->
-  <section class="contact" id="contact">
-    <div class="contact__wrapper">
-      <div class="contact__left">
-        <span class="section-tag">// 04</span>
-        <h2 class="contact__title">GET IN TOUCH</h2>
-        <p class="contact__desc">Have a piece in mind? Want to visit the workshop? Commission a custom order? We'd love
-          to hear from you.</p>
-        <div class="contact__details">
-          <div class="contact-row">
-            <span class="contact-label">EMAIL</span>
-            <span class="contact-val">hello@workshopco.com</span>
-          </div>
-          <div class="contact-row">
-            <span class="contact-label">LOCATION</span>
-            <span class="contact-val">Portland, Oregon</span>
-          </div>
-          <div class="contact-row">
-            <span class="contact-label">STUDIO VISITS</span>
-            <span class="contact-val">By appointment</span>
-          </div>
-        </div>
-      </div>
-      <div class="contact__right">
-        <form class="contact-form" id="contact-form" onsubmit="handleSubmit(event)">
-          <div class="form-group">
-            <label for="name">NAME</label>
-            <input type="text" id="name" name="name" placeholder="Your name" required />
-          </div>
-          <div class="form-group">
-            <label for="email">EMAIL</label>
-            <input type="email" id="email" name="email" placeholder="your@email.com" required />
-          </div>
-          <div class="form-group">
-            <label for="interest">INTEREST</label>
-            <select id="interest" name="interest">
-              <option value="">— Select —</option>
-              <option value="chair">Oak Side Chair</option>
-              <option value="table">Dining Table</option>
-              <option value="shelf">Wall Shelf Unit</option>
-              <option value="custom">Custom Commission</option>
-              <option value="visit">Studio Visit</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="message">MESSAGE</label>
-            <textarea id="message" name="message" rows="4" placeholder="Tell us about your project..."></textarea>
-          </div>
-          <button type="submit" id="submit-btn" class="btn btn--primary btn--full">Send Message</button>
-          <div class="form-success" id="form-success" style="display:none">
-            ✦ Message received. We'll be in touch within 2 business days.
-          </div>
-        </form>
-      </div>
+  <section class="contact" id="contact" style="padding: 96px 24px; text-align: center; background-color: var(--paper-warm, #f7f5f0); border-bottom: 1px solid var(--ink, #111);">
+    <div style="max-width: 800px; margin: 0 auto; border: 2px solid var(--ink, #111); background-color: var(--paper, #fcfbfa); padding: 48px 32px; box-shadow: 8px 8px 0px 0px #111; display: flex; flex-direction: column; align-items: center; gap: 24px;">
+      <span style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.25em; color: #666; text-transform: uppercase;">// QUICK CONTACT</span>
+      <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 0.05em; line-height: 1; margin: 0;">CONTACT US</h2>
+      <p style="font-size: 13px; color: #333; max-width: 500px; line-height: 1.6; margin: 0;">Have a question about our products, orders, or delivery? Reach out to us directly on WhatsApp for instant assistance and personalized customer support.</p>
+      <a href="https://wa.me/94752808963?text=Hi%20Laura%20Fancy%20Store%2C%20I%20would%20like%20to%20inquire%20about%20your%20products." target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; justify-content: center; gap: 12px; padding: 16px 32px; background-color: #25D366; color: #fff; font-family: 'Space Mono', monospace; font-size: 13px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; border: 2px solid #111; box-shadow: 4px 4px 0px 0px #111;">
+        <svg style="width: 24px; height: 24px; fill: currentColor;" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.99c-.002 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662a11.87 11.87 0 005.707 1.456h.005c6.554 0 11.89-5.335 11.893-11.893 0-3.177-1.238-6.163-3.487-8.411Z"/>
+        </svg>
+        Contact via WhatsApp (075 280 8963)
+      </a>
+      <div style="font-family: 'Space Mono', monospace; font-size: 10px; color: #666; letter-spacing: 0.1em; text-transform: uppercase;">Direct Line: 075 280 8963 | Available 24/7</div>
     </div>
   </section>
 
