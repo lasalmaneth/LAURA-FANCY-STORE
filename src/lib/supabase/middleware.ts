@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { isUserAdmin } from '@/lib/admin';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -36,13 +37,19 @@ export async function updateSession(request: NextRequest) {
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
   const isLoginPage = request.nextUrl.pathname === '/admin/login';
 
-  if (isAdminRoute && !isLoginPage && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/admin/login';
-    return NextResponse.redirect(url);
+  const userIsAdmin = isUserAdmin(user);
+
+  // If attempting to access /admin routes without admin authorization
+  if (isAdminRoute && !isLoginPage) {
+    if (!user || !userIsAdmin) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin/login';
+      return NextResponse.redirect(url);
+    }
   }
 
-  if (isLoginPage && user) {
+  // If visiting /admin/login while already authenticated as an admin
+  if (isLoginPage && user && userIsAdmin) {
     const url = request.nextUrl.clone();
     url.pathname = '/admin';
     return NextResponse.redirect(url);

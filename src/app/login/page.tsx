@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { login } from "@/actions/auth";
 
-export default function AdminLoginPage() {
+export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -20,13 +21,16 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center pt-20 pb-16 px-6 bg-paper-warm">
-      <div className="w-full max-w-md bg-paper border-2 border-ink p-8 shadow-xl">
+    <div className="min-h-screen flex items-center justify-center pt-24 pb-16 px-6 bg-paper-warm">
+      <div className="w-full max-w-md bg-paper border-2 border-ink p-8 shadow-[8px_8px_0px_0px_#111]">
         <div className="text-center mb-8">
           <span className="font-mono text-[10px] tracking-[0.25em] text-grey uppercase block mb-1">
-            PROTECTED PORTAL
+            ACCOUNT ACCESS
           </span>
-          <h1 className="font-display text-4xl tracking-wider">ADMIN LOGIN</h1>
+          <h1 className="font-display text-4xl tracking-wider uppercase">SIGN IN</h1>
+          <p className="text-xs text-[#555] mt-2">
+            Log in with your Email and Password.
+          </p>
         </div>
 
         {error && (
@@ -35,9 +39,7 @@ export default function AdminLoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <input type="hidden" name="isFromAdmin" value="true" />
-
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] tracking-[0.2em] font-bold uppercase text-grey">
               EMAIL ADDRESS
@@ -46,7 +48,7 @@ export default function AdminLoginPage() {
               type="email"
               name="email"
               required
-              placeholder="admin@laurafancystore.com"
+              placeholder="you@example.com"
               className="font-mono text-xs p-3 border border-ink bg-transparent outline-none focus:bg-white"
             />
           </div>
@@ -69,9 +71,16 @@ export default function AdminLoginPage() {
             disabled={loading}
             className="btn btn--primary btn--full mt-4"
           >
-            {loading ? "Authenticating Admin..." : "Sign In to Admin Portal →"}
+            {loading ? "Authenticating..." : "Sign In →"}
           </button>
         </form>
+
+        <div className="mt-8 pt-6 border-t border-ink/15 text-center text-xs font-mono">
+          Don't have an account yet?{" "}
+          <Link href="/register" className="font-bold text-ink underline hover:opacity-80">
+            Create Account →
+          </Link>
+        </div>
       </div>
     </div>
   );

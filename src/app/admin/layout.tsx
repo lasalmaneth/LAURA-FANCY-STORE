@@ -1,11 +1,24 @@
 import Link from "next/link";
 import { logout } from "@/actions/auth";
+import { createClient } from "@/lib/supabase/server";
+import { isUserAdmin } from "@/lib/admin";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const userIsAdmin = isUserAdmin(user);
+
+  if (!userIsAdmin) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="pt-24 min-h-screen flex flex-col md:flex-row bg-paper-warm">
       {/* Admin Sidebar Navigation */}
