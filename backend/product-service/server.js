@@ -114,14 +114,10 @@ function syncProductImages(productId, files = [], body = {}) {
     }
 
     if (finalUrl) {
-      // Upsert product image for this slot
+      db.prepare("DELETE FROM product_images WHERE product_id = ? AND sort_order = ?").run(productId, slot);
       db.prepare(`
         INSERT INTO product_images (id, product_id, image_url, storage_path, sort_order)
         VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT(id) DO UPDATE SET
-          image_url = excluded.image_url,
-          storage_path = excluded.storage_path,
-          sort_order = excluded.sort_order
       `).run(`img-${productId}-${slot}`, productId, finalUrl, finalUrl, slot);
     }
   }
