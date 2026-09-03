@@ -1,0 +1,7 @@
+<svg width="800" height="800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="800" height="800" fill="#D6D3D1"/>
+    <rect x="40" y="40" width="720" height="720" fill="none" stroke="#1C1917" stroke-width="1" stroke-opacity="0.2"/>
+    <text x="400" y="380" font-family="Arial, sans-serif" font-size="16" letter-spacing="6" fill="#1C1917" opacity="0.6" text-anchor="middle">SOY CERAMIC</text>
+    <text x="400" y="430" font-family="Georgia, serif" font-size="34" font-weight="bold" fill="#1C1917" text-anchor="middle">Ribbed Pillar</text>
+    <text x="400" y="480" font-family="Arial, sans-serif" font-size="12" letter-spacing="3" fill="#1C1917" opacity="0.4" text-anchor="middle">LAURA FANCY STORE</text>
+  </svg>

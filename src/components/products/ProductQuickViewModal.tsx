@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
@@ -17,15 +17,23 @@ export default function ProductQuickViewModal({
   isOpen,
   onClose,
 }: ProductQuickViewModalProps) {
-  const primaryImage = product.images?.[0]?.image_url || "/assets/images/logo.png";
-
-  // Gallery thumbnails (using primary image + fallbacks if multiple images aren't present)
+  // Extract up to 4 images from product.images sorted by sort_order
   const imageList =
-    product.images && product.images.length > 0
-      ? product.images.map((img) => img.image_url)
-      : [primaryImage, primaryImage];
+    product?.images && product.images.length > 0
+      ? product.images
+          .slice()
+          .sort((a, b) => (a.sort_order || 1) - (b.sort_order || 1))
+          .slice(0, 4)
+          .map((img) => img.image_url)
+      : [product?.images?.[0]?.image_url || "/assets/images/vacuum-flask-set.jpg"];
 
+  const primaryImage = imageList[0];
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  // Always reset to the 1st image as default when modal opens or product changes
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [product?.id, isOpen]);
 
   if (!isOpen) return null;
 

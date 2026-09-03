@@ -1,0 +1,32 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Laura Fancy Store Microservices Backend",
+  "main": "index.js",
+  "scripts": {
+    "seed": "node database/seed.js",
+    "start:auth": "node auth-service/server.js",
+    "start:product": "node product-service/server.js",
+    "start:category": "node category-service/server.js",
+    "start:gateway": "node api-gateway/server.js",
+    "start:all": "concurrently -n \"AUTH,PROD,CAT,GATE\" -c \"magenta,blue,yellow,green\" \"npm run start:auth\" \"npm run start:product\" \"npm run start:category\" \"npm run start:gateway\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^4.2.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.3.0",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

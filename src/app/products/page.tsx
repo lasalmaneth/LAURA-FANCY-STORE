@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import ProductCard from "@/components/products/ProductCard";
 import ProductFilters from "@/components/products/ProductFilters";
 import { Product, Category } from "@/lib/types";
@@ -116,20 +115,21 @@ export default async function ProductsCatalogPage({
   let categories: Category[] = [];
 
   try {
-    const supabase = await createClient();
     const [prodRes, catRes] = await Promise.all([
-      supabase.from("products").select("*, images:product_images(*)").eq("active", true),
-      supabase.from("categories").select("*"),
+      fetch("http://localhost:8080/api/products?active=true", { cache: "no-store" }),
+      fetch("http://localhost:8080/api/categories", { cache: "no-store" }),
     ]);
 
-    if (prodRes.data && prodRes.data.length > 0) {
-      products = prodRes.data;
+    if (prodRes.ok) {
+      const data = await prodRes.json();
+      if (Array.isArray(data) && data.length > 0) products = data;
     }
-    if (catRes.data && catRes.data.length > 0) {
-      categories = catRes.data;
+    if (catRes.ok) {
+      const data = await catRes.json();
+      if (Array.isArray(data) && data.length > 0) categories = data;
     }
   } catch (err) {
-    console.error("Failed to load catalog data:", err);
+    console.error("Failed to load catalog data from API Gateway:", err);
   }
 
   if (products.length === 0) products = FALLBACK_PRODUCTS;

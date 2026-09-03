@@ -30,6 +30,10 @@ export const metadata: Metadata = {
   title: "Laura Fancy Store — Everyday Essentials & Online Shopping",
   description: "Your trusted online shopping store for customer daily needs, trending gadgets, fashion, home essentials, and lifestyle products.",
   keywords: ["online store", "shopping", "daily essentials", "customer needs", "electronics", "home goods", "fashion"],
+  icons: {
+    icon: "/assets/images/logo.png",
+    apple: "/assets/images/logo.png",
+  },
 };
 
 export default function RootLayout({

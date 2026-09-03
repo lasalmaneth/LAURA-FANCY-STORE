@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/server";
 import WhatsAppButton from "@/components/products/WhatsAppButton";
 import { Product } from "@/lib/types";
 
@@ -89,11 +88,10 @@ export async function generateMetadata({
   const { slug } = await params;
   let product: Product | null = null;
   try {
-    const supabase = await createClient();
-    const { data } = await supabase.from("products").select("*").eq("slug", slug).single();
-    if (data) product = data;
+    const res = await fetch(`http://localhost:8080/api/products/${slug}`, { cache: "no-store" });
+    if (res.ok) product = await res.json();
   } catch (err) {
-    console.error("Failed to load product metadata:", err);
+    console.error("Failed to load product metadata from API Gateway:", err);
   }
   if (!product && FALLBACK_PRODUCTS[slug]) {
     product = FALLBACK_PRODUCTS[slug];
@@ -116,15 +114,10 @@ export default async function ProductDetailPage({
   let product: Product | null = null;
 
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
-      .from("products")
-      .select("*, images:product_images(*)")
-      .eq("slug", slug)
-      .single();
-    if (data) product = data;
+    const res = await fetch(`http://localhost:8080/api/products/${slug}`, { cache: "no-store" });
+    if (res.ok) product = await res.json();
   } catch (err) {
-    console.error("Failed to load product detail:", err);
+    console.error("Failed to load product detail from API Gateway:", err);
   }
 
   if (!product && FALLBACK_PRODUCTS[slug]) {
