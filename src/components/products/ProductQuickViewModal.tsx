@@ -114,31 +114,11 @@ export default function ProductQuickViewModal({
               </span>
             </div>
 
-            <p className="text-xs text-grey mb-3">
-              Free shipping & 24h express dispatch calculated at checkout.
-            </p>
-
-            {/* Rating Stars */}
-            <div className="flex items-center gap-1 text-amber-500 text-xs mb-5">
-              <span>★★★★★</span>
-              <span className="text-grey font-mono text-[11px] ml-1">4.9 / 5.0 (Customer Favorite)</span>
-            </div>
-
-            <div className="w-full h-[1px] bg-ink/15 mb-5" />
-
             {/* Bullet Point Highlights */}
             <ul className="space-y-2 text-xs text-[#333] mb-6 leading-relaxed">
               <li className="flex items-start gap-2">
                 <span className="text-ink font-bold">•</span>
                 <span>{product.description || "High quality customer everyday essential."}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-ink font-bold">•</span>
-                <span>Engineered for durability, daily convenience, and premium utility.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-ink font-bold">•</span>
-                <span>Includes 100% authenticity guarantee & 30-day easy replacement.</span>
               </li>
             </ul>
 
@@ -150,14 +130,6 @@ export default function ProductQuickViewModal({
                 productCode={product.product_code}
                 variant="large"
               />
-
-              <Link
-                href={`/products/${product.slug}`}
-                onClick={onClose}
-                className="block text-center w-full py-2.5 font-mono text-xs font-bold tracking-wider uppercase border border-ink text-ink hover:bg-ink hover:text-paper transition-colors"
-              >
-                View Full Product Details →
-              </Link>
             </div>
           </div>
         </div>

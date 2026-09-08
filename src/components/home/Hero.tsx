@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import NoticeBar from "@/components/common/NoticeBar";
 
 export default function Hero() {
   return (
@@ -18,6 +19,10 @@ export default function Hero() {
 
       {/* Main Centered Content */}
       <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center justify-center">
+        <div className="mb-8 w-full max-w-2xl">
+          <NoticeBar />
+        </div>
+        
         <div className="text-[10px] tracking-[0.25em] text-grey mb-6 uppercase">
           [ ONLINE SHOPPING STORE — DAILY ESSENTIALS ]
         </div>
@@ -27,7 +32,7 @@ export default function Hero() {
           <span className="block">DELIVERED TO YOU.</span>
         </h1>
 
-        <p className="text-xs sm:text-base leading-relaxed text-[#333] mt-10 sm:mt-14 mb-16 sm:mb-20 max-w-lg mx-auto">
+        <p className="text-xs sm:text-base leading-relaxed text-[#333] mt-10 sm:mt-14 mb-28 sm:mb-36 max-w-lg mx-auto">
           Discover top-quality daily essentials, lifestyle products & trending goods.<br />
           Curated for your everyday life with fast, reliable home delivery.
         </p>

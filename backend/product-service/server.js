@@ -52,6 +52,8 @@ function formatProduct(p) {
   return {
     ...p,
     price: Number(p.price),
+    original_price: p.original_price !== null && p.original_price !== undefined ? Number(p.original_price) : null,
+    discount_percentage: Number(p.discount_percentage || 0),
     featured: Boolean(p.featured),
     active: Boolean(p.active),
     priority_order: Number(p.priority_order !== undefined && p.priority_order !== null ? p.priority_order : 0),
@@ -243,6 +245,8 @@ router.post("/products", upload.any(), (req, res) => {
       featured,
       active,
       priority_order,
+      original_price,
+      discount_percentage,
     } = req.body;
 
     if (!name || price === undefined) {
@@ -258,12 +262,15 @@ router.post("/products", upload.any(), (req, res) => {
         .replace(/^-|-$/g, "") + `-${Math.floor(Math.random() * 1000)}`;
     const code = product_code || `LFS-${Math.floor(100 + Math.random() * 900)}`;
     const priority = priority_order !== undefined && priority_order !== "" ? parseInt(priority_order, 10) : 0;
+    const origPrice = original_price !== undefined && original_price !== "" ? parseFloat(original_price) : null;
+    const discountPct = discount_percentage !== undefined && discount_percentage !== "" ? parseInt(discount_percentage, 10) : 0;
 
     db.prepare(`
       INSERT INTO products (
         id, name, slug, description, short_description, price,
-        category_id, product_code, stock_status, featured, active, priority_order
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        category_id, product_code, stock_status, featured, active, priority_order,
+        original_price, discount_percentage
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       id,
       name,
@@ -276,7 +283,9 @@ router.post("/products", upload.any(), (req, res) => {
       stock_status || "in_stock",
       featured === "true" || featured === true || featured === 1 ? 1 : 0,
       active === "false" || active === false || active === 0 ? 0 : 1,
-      priority
+      priority,
+      origPrice,
+      discountPct
     );
 
     // Sync up to 4 images
@@ -310,6 +319,8 @@ router.put("/products/:id", upload.any(), (req, res) => {
       featured,
       active,
       priority_order,
+      original_price,
+      discount_percentage,
     } = req.body;
 
     const updatedName = name !== undefined ? name : existing.name;
@@ -325,12 +336,17 @@ router.put("/products/:id", upload.any(), (req, res) => {
       active !== undefined ? (active === "false" || active === false || active === 0 ? 0 : 1) : existing.active;
     const updatedPriority =
       priority_order !== undefined && priority_order !== "" ? parseInt(priority_order, 10) : (existing.priority_order || 0);
+    const updatedOrigPrice =
+      original_price !== undefined ? (original_price === "" ? null : parseFloat(original_price)) : existing.original_price;
+    const updatedDiscountPct =
+      discount_percentage !== undefined ? (discount_percentage === "" ? 0 : parseInt(discount_percentage, 10)) : existing.discount_percentage;
 
     db.prepare(`
       UPDATE products
       SET name = ?, description = ?, short_description = ?, price = ?,
           category_id = ?, product_code = ?, stock_status = ?,
-          featured = ?, active = ?, priority_order = ?, updated_at = CURRENT_TIMESTAMP
+          featured = ?, active = ?, priority_order = ?,
+          original_price = ?, discount_percentage = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).run(
       updatedName,
@@ -343,6 +359,8 @@ router.put("/products/:id", upload.any(), (req, res) => {
       updatedFeatured,
       updatedActive,
       updatedPriority,
+      updatedOrigPrice,
+      updatedDiscountPct,
       id
     );
 
@@ -371,6 +389,75 @@ router.patch("/products/:id/priority", (req, res) => {
   } catch (err) {
     console.error("Update priority error:", err);
     res.status(500).json({ error: "Failed to update product priority" });
+  }
+});
+
+// ---------------- STORE NOTICES & PROMOTIONS ----------------
+// GET Store Notice (Public & Admin)
+router.get("/notice", (req, res) => {
+  try {
+    let notice = db.prepare("SELECT * FROM store_notices WHERE id = 'primary'").get();
+    if (!notice) {
+      db.prepare(`
+        INSERT INTO store_notices (id, notice_text, badge_text, is_active, min_order_amount, discount_percentage)
+        VALUES ('primary', 'Buy 3500 or more and get Free Delivery !!! .... hurry up limited time only ....', 'LIMITED TIME ONLY', 1, 3500, 0)
+      `).run();
+      notice = db.prepare("SELECT * FROM store_notices WHERE id = 'primary'").get();
+    }
+    res.json({
+      ...notice,
+      is_active: Boolean(notice.is_active),
+      min_order_amount: Number(notice.min_order_amount || 3500),
+      discount_percentage: Number(notice.discount_percentage || 0),
+    });
+  } catch (err) {
+    console.error("Fetch notice error:", err);
+    res.status(500).json({ error: "Failed to fetch store notice" });
+  }
+});
+
+// PUT Update Store Notice (Admin)
+router.put("/notice", (req, res) => {
+  try {
+    const {
+      notice_text,
+      badge_text,
+      is_active,
+      min_order_amount,
+      discount_percentage,
+    } = req.body;
+
+    let existing = db.prepare("SELECT * FROM store_notices WHERE id = 'primary'").get();
+    if (!existing) {
+      db.prepare(`
+        INSERT INTO store_notices (id, notice_text, badge_text, is_active, min_order_amount, discount_percentage)
+        VALUES ('primary', 'Buy 3500 or more and get Free Delivery !!! .... hurry up limited time only ....', 'LIMITED TIME ONLY', 1, 3500, 0)
+      `).run();
+      existing = db.prepare("SELECT * FROM store_notices WHERE id = 'primary'").get();
+    }
+
+    const text = notice_text !== undefined ? notice_text : existing.notice_text;
+    const badge = badge_text !== undefined ? badge_text : existing.badge_text;
+    const active = is_active !== undefined ? (is_active === true || is_active === "true" || is_active === 1 ? 1 : 0) : existing.is_active;
+    const minOrder = min_order_amount !== undefined ? parseFloat(min_order_amount) : existing.min_order_amount;
+    const discount = discount_percentage !== undefined ? parseFloat(discount_percentage) : existing.discount_percentage;
+
+    db.prepare(`
+      UPDATE store_notices
+      SET notice_text = ?, badge_text = ?, is_active = ?, min_order_amount = ?, discount_percentage = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = 'primary'
+    `).run(text, badge, active, minOrder, discount);
+
+    const updated = db.prepare("SELECT * FROM store_notices WHERE id = 'primary'").get();
+    res.json({
+      ...updated,
+      is_active: Boolean(updated.is_active),
+      min_order_amount: Number(updated.min_order_amount || 3500),
+      discount_percentage: Number(updated.discount_percentage || 0),
+    });
+  } catch (err) {
+    console.error("Update notice error:", err);
+    res.status(500).json({ error: "Failed to update store notice" });
   }
 });
 

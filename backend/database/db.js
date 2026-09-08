@@ -39,9 +39,21 @@ db.exec(`
     featured INTEGER DEFAULT 0,
     active INTEGER DEFAULT 1,
     priority_order INTEGER DEFAULT 0,
+    original_price REAL DEFAULT NULL,
+    discount_percentage INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS store_notices (
+    id TEXT PRIMARY KEY DEFAULT 'primary',
+    notice_text TEXT NOT NULL,
+    badge_text TEXT DEFAULT 'LIMITED TIME ONLY',
+    is_active INTEGER DEFAULT 1,
+    min_order_amount REAL DEFAULT 3500,
+    discount_percentage REAL DEFAULT 0,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS product_images (

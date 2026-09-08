@@ -17,7 +17,14 @@ const SERVICES = {
 // Enable CORS for frontend clients
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3001",
+      "http://localhost:5500",
+      "http://127.0.0.1:5500"
+    ],
     credentials: true,
   })
 );
@@ -111,6 +118,22 @@ app.use(
   "/api/categories",
   createProxyMiddleware({
     target: `${SERVICES.category}/categories`,
+    changeOrigin: true,
+  })
+);
+
+app.use(
+  "/api/notice",
+  createProxyMiddleware({
+    target: `${SERVICES.product}/notice`,
+    changeOrigin: true,
+  })
+);
+
+app.use(
+  "/api/admin/notice",
+  createProxyMiddleware({
+    target: `${SERVICES.product}/notice`,
     changeOrigin: true,
   })
 );

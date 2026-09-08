@@ -105,4 +105,13 @@ export const api = {
     request(`/api/admin/categories/${id}`, {
       method: "DELETE",
     }),
+
+  // Store Notices & Promotions
+  getNotice: () => request("/api/notice"),
+
+  updateNotice: (data) =>
+    request("/api/admin/notice", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
 };

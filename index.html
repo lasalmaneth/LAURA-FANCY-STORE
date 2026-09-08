@@ -88,6 +88,9 @@
     </div>
     <div
       style="position: relative; z-index: 10; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <!-- Dynamic Notice Bar inside Hero -->
+      <div id="dynamic-notice-bar" style="display: none; width: 100%; max-width: 600px; margin-bottom: 32px; background: #111; color: #f4f0ea; padding: 8px 16px; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; z-index: 100; position: relative; font-family: 'Space Mono', monospace; text-transform: uppercase; font-size: 14px; font-weight: bold; letter-spacing: 0.05em; border: 1px solid #111;"></div>
+
       <div
         style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.25em; color: #666; text-transform: uppercase; margin-bottom: 24px;">
         [ ONLINE SHOPPING STORE — DAILY ESSENTIALS ]</div>
@@ -96,7 +99,7 @@
         EVERYDAY NEEDS.<br />DELIVERED TO YOU.
       </h1>
       <p
-        style="font-size: 15px; line-height: 1.6; color: #333; margin-top: 44px; margin-bottom: 68px; max-width: 540px; margin-left: auto; margin-right: auto;">
+        style="font-size: 15px; line-height: 1.6; color: #333; margin-top: 44px; margin-bottom: 110px; max-width: 540px; margin-left: auto; margin-right: auto;">
         Discover top-quality daily essentials, lifestyle products & trending goods.<br />Curated for your everyday life
         with fast, reliable home delivery.</p>
       <div
@@ -308,6 +311,29 @@
   </footer>
 
   <script type="module" src="assets/js/main.js"></script>
+  <script>
+    // Fetch and display dynamic notice bar
+    fetch('http://localhost:8080/api/notice')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.is_active) {
+          const noticeBar = document.getElementById('dynamic-notice-bar');
+          let html = '';
+          if (data.badge_text) {
+            html += `<span style="background: #f4f0ea; color: #111; padding: 2px 8px; white-space: nowrap;">${data.badge_text}</span>`;
+          }
+          html += `<span>${data.notice_text}</span>`;
+          noticeBar.innerHTML = html;
+          noticeBar.style.display = 'flex';
+          
+          // Responsive layout for notice bar
+          if (window.innerWidth > 640) {
+            noticeBar.style.flexDirection = 'row';
+          }
+        }
+      })
+      .catch(err => console.error('Failed to fetch notice:', err));
+  </script>
 </body>
 
 </html>

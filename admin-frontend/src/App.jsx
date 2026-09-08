@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Upload,
   RefreshCw,
+  Megaphone,
 } from "lucide-react";
 
 export default function App() {
@@ -36,6 +37,8 @@ export default function App() {
     category_id: "",
     product_code: "",
     priority_order: 1,
+    original_price: "",
+    discount_percentage: 0,
     stock_status: "in_stock",
     featured: false,
     active: true,
@@ -43,6 +46,15 @@ export default function App() {
     description: "",
     imageFile: null,
   });
+
+  const [notice, setNotice] = useState({
+    notice_text: "Buy 3500 or more and get Free Delivery !!! .... hurry up limited time only ....",
+    badge_text: "LIMITED TIME ONLY",
+    is_active: true,
+    min_order_amount: 3500,
+    discount_percentage: 0,
+  });
+  const [noticeSaving, setNoticeSaving] = useState(false);
 
   const [categoryForm, setCategoryForm] = useState({ name: "", slug: "" });
 
@@ -54,14 +66,16 @@ export default function App() {
     if (!auth.isAuthenticated()) return;
     setLoading(true);
     try {
-      const [statsData, prodsData, catsData] = await Promise.all([
+      const [statsData, prodsData, catsData, noticeData] = await Promise.all([
         api.getStats().catch(() => ({ total: 0, inStock: 0, outOfStock: 0, categoriesCount: 0 })),
         api.getProducts(),
         api.getCategories(),
+        api.getNotice().catch(() => null),
       ]);
       setStats(statsData);
       setProducts(prodsData);
       setCategories(catsData);
+      if (noticeData) setNotice(noticeData);
     } catch (err) {
       console.error(err);
       setFeedback({ type: "error", message: err.message });
@@ -127,6 +141,8 @@ export default function App() {
     setProductForm({
       name: "",
       price: "",
+      original_price: "",
+      discount_percentage: 0,
       category_id: categories[0]?.id || "",
       product_code: "",
       priority_order: products.length + 1,
@@ -150,6 +166,8 @@ export default function App() {
     setProductForm({
       name: prod.name,
       price: prod.price,
+      original_price: prod.original_price || "",
+      discount_percentage: prod.discount_percentage || 0,
       category_id: prod.category_id || "",
       product_code: prod.product_code || "",
       priority_order: prod.priority_order !== undefined ? prod.priority_order : 0,
@@ -183,6 +201,8 @@ export default function App() {
     const formData = new FormData();
     formData.append("name", productForm.name);
     formData.append("price", productForm.price);
+    formData.append("original_price", productForm.original_price || "");
+    formData.append("discount_percentage", productForm.discount_percentage || 0);
     formData.append("category_id", productForm.category_id);
     formData.append("product_code", productForm.product_code);
     formData.append("priority_order", productForm.priority_order !== undefined ? productForm.priority_order : 0);
@@ -273,6 +293,20 @@ export default function App() {
       loadAllData();
     } catch (err) {
       alert("Stock update failed: " + err.message);
+    }
+  };
+
+  const handleNoticeSubmit = async (e) => {
+    e.preventDefault();
+    setNoticeSaving(true);
+    try {
+      const updated = await api.updateNotice(notice);
+      setNotice(updated);
+      setFeedback({ type: "success", message: "Store notice and settings updated successfully!" });
+    } catch (err) {
+      alert("Error saving notice: " + err.message);
+    } finally {
+      setNoticeSaving(false);
     }
   };
 
@@ -370,6 +404,13 @@ export default function App() {
             <Boxes size={18} />
             Inventory Control
           </button>
+          <button
+            className={`nav-item ${activeTab === "notices" ? "active" : ""}`}
+            onClick={() => setActiveTab("notices")}
+          >
+            <Megaphone size={18} />
+            Store Notice & Promos
+          </button>
         </nav>
 
         <div className="sidebar-footer">
@@ -393,6 +434,7 @@ export default function App() {
             {activeTab === "products" && "Product Catalog Management"}
             {activeTab === "categories" && "Store Category Management"}
             {activeTab === "inventory" && "Fast Inventory & Price Control"}
+            {activeTab === "notices" && "Store Notice & Promotional Announcements"}
           </h1>
 
           <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
@@ -616,6 +658,16 @@ export default function App() {
                         <span style={{ fontFamily: "var(--font-mono)", fontWeight: "bold" }}>
                           Rs. {p.price.toLocaleString("en-US")}
                         </span>
+                        {p.original_price && p.original_price > p.price && (
+                          <div style={{ display: "flex", gap: "4px", alignItems: "center", marginTop: "2px" }}>
+                            <del style={{ fontSize: "11px", color: "#94a3b8" }}>
+                              Rs. {p.original_price.toLocaleString("en-US")}
+                            </del>
+                            <span style={{ fontSize: "10px", color: "#ef4444", fontWeight: "700" }}>
+                              -{p.discount_percentage || Math.round(((p.original_price - p.price) / p.original_price) * 100)}%
+                            </span>
+                          </div>
+                        )}
                       </td>
                       <td>
                         {p.featured ? (
@@ -791,6 +843,86 @@ export default function App() {
               </table>
             </div>
           )}
+          {/* TAB 5: NOTICES */}
+          {activeTab === "notices" && (
+            <div className="table-card" style={{ maxWidth: "800px" }}>
+              <div className="table-header">
+                <h3>Store Notice & Promotional Settings</h3>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+                  This notice appears at the top of the customer storefront.
+                </span>
+              </div>
+              <form onSubmit={handleNoticeSubmit} style={{ padding: "24px" }}>
+                <div className="form-group" style={{ marginBottom: "20px" }}>
+                  <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+                    <input
+                      type="checkbox"
+                      checked={notice.is_active}
+                      onChange={(e) => setNotice({ ...notice, is_active: e.target.checked })}
+                      style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                    />
+                    <span style={{ fontSize: "16px", fontWeight: "bold" }}>Enable Global Store Notice Bar</span>
+                  </label>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Main Notice Text</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={notice.notice_text}
+                    onChange={(e) => setNotice({ ...notice, notice_text: e.target.value })}
+                    placeholder="e.g., Buy 3500 or more and get Free Delivery !!!"
+                    required
+                  />
+                  <small style={{ color: "#64748b", marginTop: "4px", display: "block" }}>The primary message shown to customers.</small>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Badge/Highlight Text</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={notice.badge_text}
+                      onChange={(e) => setNotice({ ...notice, badge_text: e.target.value })}
+                      placeholder="e.g., LIMITED TIME ONLY"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Minimum Order Amount (LKR) [Optional Context]</label>
+                    <input
+                      type="number"
+                      className="form-input"
+                      value={notice.min_order_amount}
+                      onChange={(e) => setNotice({ ...notice, min_order_amount: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Global Discount % [Optional Context]</label>
+                    <input
+                      type="number"
+                      className="form-input"
+                      value={notice.discount_percentage}
+                      onChange={(e) => setNotice({ ...notice, discount_percentage: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="btn btn-primary" 
+                  style={{ marginTop: "20px" }}
+                  disabled={noticeSaving}
+                >
+                  {noticeSaving ? "Saving..." : "Save Notice Settings"}
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </main>
 
@@ -819,7 +951,7 @@ export default function App() {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">Price (LKR) *</label>
+                    <label className="form-label">Selling Price (LKR) *</label>
                     <input
                       type="number"
                       className="form-input"
@@ -828,6 +960,39 @@ export default function App() {
                       required
                     />
                   </div>
+                  <div className="form-group">
+                    <label className="form-label">Regular / Original Price (LKR)</label>
+                    <input
+                      type="number"
+                      className="form-input"
+                      placeholder="e.g. 1500 (optional)"
+                      value={productForm.original_price}
+                      onChange={(e) => {
+                        const orig = e.target.value;
+                        const sell = parseFloat(productForm.price);
+                        let discount = productForm.discount_percentage;
+                        if (orig && sell && parseFloat(orig) > sell) {
+                          discount = Math.round(((parseFloat(orig) - sell) / parseFloat(orig)) * 100);
+                        }
+                        setProductForm({ ...productForm, original_price: orig, discount_percentage: discount });
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Discount (% OFF)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="99"
+                      className="form-input"
+                      placeholder="e.g. 20"
+                      value={productForm.discount_percentage}
+                      onChange={(e) => setProductForm({ ...productForm, discount_percentage: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
                   <div className="form-group">
                     <label className="form-label">Product Code</label>
                     <input
