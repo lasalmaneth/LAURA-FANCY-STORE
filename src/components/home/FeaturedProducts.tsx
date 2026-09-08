@@ -26,6 +26,7 @@ const FALLBACK_PRODUCTS: Product[] = [
         created_at: new Date().toISOString(),
       },
     ],
+    priority_order: 1,
   },
   {
     id: "2",
@@ -41,6 +42,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    priority_order: 2,
   },
   {
     id: "3",
@@ -56,6 +58,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    priority_order: 3,
   },
 ];
 
@@ -64,12 +67,16 @@ interface FeaturedProductsProps {
 }
 
 export default function FeaturedProducts({ products }: FeaturedProductsProps) {
-  const displayProducts = products && products.length > 0 ? products : FALLBACK_PRODUCTS;
+  const rawProducts = products && products.length > 0 ? products : FALLBACK_PRODUCTS;
+  const displayProducts = [...rawProducts].sort((a, b) => {
+    const pa = a.priority_order !== undefined && a.priority_order > 0 ? a.priority_order : 9999;
+    const pb = b.priority_order !== undefined && b.priority_order > 0 ? b.priority_order : 9999;
+    return pa - pb;
+  });
 
   return (
     <section className="py-24 border-b border-ink" id="products">
       <div className="section-header">
-        <span className="section-tag">// 01</span>
         <h2 className="section-title">FEATURED ESSENTIALS</h2>
         <div className="section-line" />
       </div>

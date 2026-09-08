@@ -54,6 +54,7 @@ function formatProduct(p) {
     price: Number(p.price),
     featured: Boolean(p.featured),
     active: Boolean(p.active),
+    priority_order: Number(p.priority_order !== undefined && p.priority_order !== null ? p.priority_order : 0),
     imageUrl: mainImageUrl,
     images: images.map((img) => ({
       id: img.id,
@@ -157,7 +158,7 @@ router.get("/admin/stats", (req, res) => {
 router.get("/products/featured", (req, res) => {
   try {
     const rows = db
-      .prepare("SELECT * FROM products WHERE active = 1 AND featured = 1 ORDER BY updated_at DESC LIMIT 6")
+      .prepare("SELECT * FROM products WHERE active = 1 AND featured = 1 ORDER BY CASE WHEN priority_order > 0 THEN priority_order ELSE 9999 END ASC, updated_at DESC LIMIT 6")
       .all();
     const products = rows.map(formatProduct);
     res.json(products);
@@ -198,7 +199,7 @@ router.get("/products", (req, res) => {
     } else if (sort === "price-desc") {
       query += " ORDER BY price DESC";
     } else {
-      query += " ORDER BY updated_at DESC";
+      query += " ORDER BY CASE WHEN priority_order > 0 THEN priority_order ELSE 9999 END ASC, updated_at DESC";
     }
 
     const rows = db.prepare(query).all(...params);
@@ -241,6 +242,7 @@ router.post("/products", upload.any(), (req, res) => {
       stock_status,
       featured,
       active,
+      priority_order,
     } = req.body;
 
     if (!name || price === undefined) {
@@ -255,12 +257,13 @@ router.post("/products", upload.any(), (req, res) => {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "") + `-${Math.floor(Math.random() * 1000)}`;
     const code = product_code || `LFS-${Math.floor(100 + Math.random() * 900)}`;
+    const priority = priority_order !== undefined && priority_order !== "" ? parseInt(priority_order, 10) : 0;
 
     db.prepare(`
       INSERT INTO products (
         id, name, slug, description, short_description, price,
-        category_id, product_code, stock_status, featured, active
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        category_id, product_code, stock_status, featured, active, priority_order
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       id,
       name,
@@ -272,7 +275,8 @@ router.post("/products", upload.any(), (req, res) => {
       code,
       stock_status || "in_stock",
       featured === "true" || featured === true || featured === 1 ? 1 : 0,
-      active === "false" || active === false || active === 0 ? 0 : 1
+      active === "false" || active === false || active === 0 ? 0 : 1,
+      priority
     );
 
     // Sync up to 4 images
@@ -305,6 +309,7 @@ router.put("/products/:id", upload.any(), (req, res) => {
       stock_status,
       featured,
       active,
+      priority_order,
     } = req.body;
 
     const updatedName = name !== undefined ? name : existing.name;
@@ -318,12 +323,14 @@ router.put("/products/:id", upload.any(), (req, res) => {
       featured !== undefined ? (featured === "true" || featured === true || featured === 1 ? 1 : 0) : existing.featured;
     const updatedActive =
       active !== undefined ? (active === "false" || active === false || active === 0 ? 0 : 1) : existing.active;
+    const updatedPriority =
+      priority_order !== undefined && priority_order !== "" ? parseInt(priority_order, 10) : (existing.priority_order || 0);
 
     db.prepare(`
       UPDATE products
       SET name = ?, description = ?, short_description = ?, price = ?,
           category_id = ?, product_code = ?, stock_status = ?,
-          featured = ?, active = ?, updated_at = CURRENT_TIMESTAMP
+          featured = ?, active = ?, priority_order = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).run(
       updatedName,
@@ -335,6 +342,7 @@ router.put("/products/:id", upload.any(), (req, res) => {
       updatedStock,
       updatedFeatured,
       updatedActive,
+      updatedPriority,
       id
     );
 
@@ -348,6 +356,21 @@ router.put("/products/:id", upload.any(), (req, res) => {
   } catch (err) {
     console.error("Update product error:", err);
     res.status(500).json({ error: "Failed to update product: " + err.message });
+  }
+});
+
+// PATCH Update Product Priority Order quickly
+router.patch("/products/:id/priority", (req, res) => {
+  try {
+    const { id } = req.params;
+    const { priority_order } = req.body;
+    const priority = parseInt(priority_order, 10) || 0;
+    db.prepare("UPDATE products SET priority_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(priority, id);
+    const updated = db.prepare("SELECT * FROM products WHERE id = ?").get(id);
+    res.json(formatProduct(updated));
+  } catch (err) {
+    console.error("Update priority error:", err);
+    res.status(500).json({ error: "Failed to update product priority" });
   }
 });
 

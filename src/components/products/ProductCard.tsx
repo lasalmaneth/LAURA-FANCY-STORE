@@ -15,7 +15,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, index = 1 }: ProductCardProps) {
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const isFeatured = product.featured;
-  const numStr = String(index).padStart(3, "0");
+  const numStr = String(product.priority_order !== undefined && product.priority_order > 0 ? product.priority_order : index).padStart(3, "0");
   const mainImage = product.images?.[0]?.image_url;
 
   return (

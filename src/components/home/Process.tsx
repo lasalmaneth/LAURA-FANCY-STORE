@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 // Card 01 Custom Icon Component: Browse & Select
 function BrowseSelectIcon() {
@@ -232,10 +232,6 @@ export default function Process() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-paper/5 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="flex flex-col items-start mb-16 px-6 md:px-12 relative z-10">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="font-mono text-[10px] tracking-[0.2em] text-paper/40">// 03</span>
-          <Sparkles className="w-3.5 h-3.5 text-paper/40" />
-        </div>
         <h2 className="font-display text-4xl sm:text-5xl md:text-6xl tracking-wider leading-none text-paper">
           HOW WE SERVE YOU
         </h2>

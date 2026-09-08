@@ -9,9 +9,9 @@ export default function Hero() {
         <Image
           src="/assets/images/logo.png"
           alt=""
-          width={520}
-          height={520}
-          className="w-[min(520px,80%)] h-auto opacity-[0.12] grayscale select-none object-contain"
+          width={560}
+          height={560}
+          className="w-[min(560px,88%)] h-auto opacity-[0.25] grayscale select-none object-contain"
           priority
         />
       </div>
@@ -27,12 +27,12 @@ export default function Hero() {
           <span className="block">DELIVERED TO YOU.</span>
         </h1>
 
-        <p className="text-xs sm:text-base leading-relaxed text-[#333] mb-9 max-w-lg mx-auto">
+        <p className="text-xs sm:text-base leading-relaxed text-[#333] mt-10 sm:mt-14 mb-16 sm:mb-20 max-w-lg mx-auto">
           Discover top-quality daily essentials, lifestyle products & trending goods.<br />
           Curated for your everyday life with fast, reliable home delivery.
         </p>
 
-        <div className="flex flex-wrap gap-4 items-center justify-center mb-12">
+        <div className="flex flex-wrap gap-4 items-center justify-center mb-12 sm:mb-14">
           <Link href="/products" className="btn btn--primary">
             Shop Catalog Now
           </Link>
@@ -42,11 +42,6 @@ export default function Hero() {
         </div>
 
         <div className="flex flex-wrap items-center justify-center border border-ink overflow-hidden mx-auto bg-paper/80 backdrop-blur-sm">
-          <div className="px-6 sm:px-8 py-4 text-center hover:bg-ink hover:text-paper group transition-colors">
-            <span className="block font-display text-2xl sm:text-3xl leading-none group-hover:text-paper">10k+</span>
-            <span className="block text-[9px] tracking-[0.2em] text-grey uppercase mt-1 group-hover:text-paper">Orders Delivered</span>
-          </div>
-          <div className="w-[1px] bg-ink self-stretch hidden sm:block" />
           <div className="px-6 sm:px-8 py-4 text-center hover:bg-ink hover:text-paper group transition-colors">
             <span className="block font-display text-2xl sm:text-3xl leading-none group-hover:text-paper">100%</span>
             <span className="block text-[9px] tracking-[0.2em] text-grey uppercase mt-1 group-hover:text-paper">Quality Checked</span>

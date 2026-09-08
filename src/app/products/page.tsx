@@ -34,6 +34,7 @@ const FALLBACK_PRODUCTS: Product[] = [
         created_at: new Date().toISOString(),
       },
     ],
+    priority_order: 1,
   },
   {
     id: "2",
@@ -49,6 +50,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    priority_order: 2,
   },
   {
     id: "3",
@@ -64,6 +66,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    priority_order: 3,
   },
   {
     id: "4",
@@ -79,6 +82,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    priority_order: 4,
   },
   {
     id: "5",
@@ -94,6 +98,7 @@ const FALLBACK_PRODUCTS: Product[] = [
     active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    priority_order: 5,
   },
 ];
 
@@ -149,6 +154,13 @@ export default async function ProductsCatalogPage({
         p.product_code.toLowerCase().includes(query)
     );
   }
+
+  // Always display in designated priority order
+  filteredProducts = [...filteredProducts].sort((a, b) => {
+    const pa = a.priority_order !== undefined && a.priority_order > 0 ? a.priority_order : 9999;
+    const pb = b.priority_order !== undefined && b.priority_order > 0 ? b.priority_order : 9999;
+    return pa - pb;
+  });
 
   return (
     <div className="pt-28 pb-24 min-h-screen">

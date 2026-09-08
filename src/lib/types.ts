@@ -29,6 +29,7 @@ export interface Product {
   stock_status: StockStatus;
   featured: boolean;
   active: boolean;
+  priority_order?: number;
   created_at: string;
   updated_at: string;
   category?: Category;

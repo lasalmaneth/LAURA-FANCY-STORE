@@ -38,6 +38,7 @@ db.exec(`
     stock_status TEXT DEFAULT 'in_stock',
     featured INTEGER DEFAULT 0,
     active INTEGER DEFAULT 1,
+    priority_order INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL

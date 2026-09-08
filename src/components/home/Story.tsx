@@ -11,7 +11,6 @@ export default function Story() {
       </div>
 
       <div className="max-w-3xl mx-auto text-center relative z-10">
-        <span className="section-tag inline-block mb-2">// 02</span>
         <h2 className="section-title mb-10 text-center">ABOUT LAURA FANCY STORE</h2>
         
         <div className="text-base sm:text-xl md:text-2xl leading-relaxed text-[#222] font-serif italic space-y-6">

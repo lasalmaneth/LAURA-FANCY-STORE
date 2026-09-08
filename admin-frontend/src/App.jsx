@@ -35,6 +35,7 @@ export default function App() {
     price: "",
     category_id: "",
     product_code: "",
+    priority_order: 1,
     stock_status: "in_stock",
     featured: false,
     active: true,
@@ -128,6 +129,7 @@ export default function App() {
       price: "",
       category_id: categories[0]?.id || "",
       product_code: "",
+      priority_order: products.length + 1,
       stock_status: "in_stock",
       featured: false,
       active: true,
@@ -150,6 +152,7 @@ export default function App() {
       price: prod.price,
       category_id: prod.category_id || "",
       product_code: prod.product_code || "",
+      priority_order: prod.priority_order !== undefined ? prod.priority_order : 0,
       stock_status: prod.stock_status || "in_stock",
       featured: prod.featured || false,
       active: prod.active !== undefined ? prod.active : true,
@@ -182,6 +185,7 @@ export default function App() {
     formData.append("price", productForm.price);
     formData.append("category_id", productForm.category_id);
     formData.append("product_code", productForm.product_code);
+    formData.append("priority_order", productForm.priority_order !== undefined ? productForm.priority_order : 0);
     formData.append("stock_status", productForm.stock_status);
     formData.append("featured", productForm.featured);
     formData.append("active", productForm.active);
@@ -476,6 +480,7 @@ export default function App() {
                     <tr>
                       <th>Thumbnail</th>
                       <th>Product Name</th>
+                      <th>Priority</th>
                       <th>Code</th>
                       <th>Price</th>
                       <th>Category</th>
@@ -498,6 +503,23 @@ export default function App() {
                         </td>
                         <td>
                           <strong>{p.name}</strong>
+                        </td>
+                        <td>
+                          <span
+                            className="badge"
+                            style={{
+                              background: "#f1f5f9",
+                              color: "#0f172a",
+                              fontWeight: "800",
+                              fontFamily: "var(--font-mono)",
+                              fontSize: "12px",
+                              border: "1px solid #cbd5e1",
+                              padding: "2px 8px",
+                              borderRadius: "6px",
+                            }}
+                          >
+                            #{p.priority_order || "—"}
+                          </span>
                         </td>
                         <td>
                           <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px" }}>{p.product_code}</span>
@@ -541,6 +563,7 @@ export default function App() {
                   <tr>
                     <th>Image</th>
                     <th>Name</th>
+                    <th>Priority</th>
                     <th>Code</th>
                     <th>Category</th>
                     <th>Price</th>
@@ -565,6 +588,25 @@ export default function App() {
                       <td>
                         <strong>{p.name}</strong>
                         <p style={{ fontSize: "11px", color: "var(--text-muted)" }}>{p.short_description?.slice(0, 50)}...</p>
+                      </td>
+                      <td>
+                        <span
+                          className="badge"
+                          style={{
+                            background: "#f1f5f9",
+                            color: "#0f172a",
+                            fontWeight: "800",
+                            fontFamily: "var(--font-mono)",
+                            fontSize: "12px",
+                            border: "1px solid #cbd5e1",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            display: "inline-block",
+                          }}
+                          title="Frontend display priority order"
+                        >
+                          #{p.priority_order || "—"}
+                        </span>
                       </td>
                       <td>
                         <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px" }}>{p.product_code}</span>
@@ -794,6 +836,17 @@ export default function App() {
                       placeholder="e.g. LFS-101"
                       value={productForm.product_code}
                       onChange={(e) => setProductForm({ ...productForm, product_code: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Priority Order (Frontend)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      className="form-input"
+                      placeholder="e.g. 1, 2, 3..."
+                      value={productForm.priority_order}
+                      onChange={(e) => setProductForm({ ...productForm, priority_order: e.target.value })}
                     />
                   </div>
                 </div>
