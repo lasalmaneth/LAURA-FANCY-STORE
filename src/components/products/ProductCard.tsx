@@ -35,7 +35,7 @@ export default function ProductCard({ product, index = 1 }: ProductCardProps) {
               src={mainImage}
               alt={product.name}
               fill
-              className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+              className="object-contain p-4 w-full h-full transition-transform duration-500 group-hover:scale-105"
               priority
             />
           ) : (

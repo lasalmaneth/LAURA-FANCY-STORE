@@ -13,7 +13,7 @@ export default function Story() {
       <div className="max-w-3xl mx-auto text-center relative z-10">
         <h2 className="section-title mb-10 text-center">ABOUT LAURA FANCY STORE</h2>
         
-        <div className="text-base sm:text-xl md:text-2xl leading-relaxed text-[#222] font-serif italic space-y-6">
+        <div className="text-lg sm:text-2xl md:text-3xl leading-relaxed text-[#222] font-serif italic space-y-6">
           <p>
             &ldquo;Laura Fancy Store is your ultimate online shopping destination, created to bring high-quality everyday essentials and customer needs right to your doorstep.
           </p>
