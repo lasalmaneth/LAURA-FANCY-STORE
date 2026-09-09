@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 export const auth = {
   getToken: () => localStorage.getItem("admin_token"),
@@ -132,5 +132,19 @@ export const api = {
     request("/api/admin/notice", {
       method: "PUT",
       body: JSON.stringify(data),
+    }),
+
+  // Admin Team Management
+  getAdminUsers: () => request("/api/admin/users"),
+
+  createAdminUser: (data) =>
+    request("/api/admin/users", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  deleteAdminUser: (id) =>
+    request(`/api/admin/users/${id}`, {
+      method: "DELETE",
     }),
 };

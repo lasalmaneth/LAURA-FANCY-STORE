@@ -1,6 +1,8 @@
 import ProductCard from "@/components/products/ProductCard";
 import ProductFilters from "@/components/products/ProductFilters";
 import { Product, Category } from "@/lib/types";
+import { createClient } from "@/lib/supabase/server";
+import { API_BASE_URL } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
 
@@ -119,22 +121,47 @@ export default async function ProductsCatalogPage({
   let products: Product[] = [];
   let categories: Category[] = [];
 
+  // 1. Fetch from live Supabase Cloud Database
   try {
+    const supabase = await createClient();
     const [prodRes, catRes] = await Promise.all([
-      fetch("http://localhost:8080/api/products?active=true", { cache: "no-store" }),
-      fetch("http://localhost:8080/api/categories", { cache: "no-store" }),
+      supabase
+        .from("products")
+        .select("*, categories(*), images:product_images(*)")
+        .eq("active", true)
+        .order("created_at", { ascending: false }),
+      supabase.from("categories").select("*").order("name", { ascending: true }),
     ]);
 
-    if (prodRes.ok) {
-      const data = await prodRes.json();
-      if (Array.isArray(data) && data.length > 0) products = data;
+    if (!prodRes.error && Array.isArray(prodRes.data) && prodRes.data.length > 0) {
+      products = prodRes.data;
     }
-    if (catRes.ok) {
-      const data = await catRes.json();
-      if (Array.isArray(data) && data.length > 0) categories = data;
+    if (!catRes.error && Array.isArray(catRes.data) && catRes.data.length > 0) {
+      categories = catRes.data;
     }
   } catch (err) {
-    console.error("Failed to load catalog data from API Gateway:", err);
+    console.error("Supabase catalog load error:", err);
+  }
+
+  // 2. Fallback to API Gateway if Supabase returned nothing
+  if (products.length === 0 || categories.length === 0) {
+    try {
+      const [prodRes, catRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/products?active=true`, { cache: "no-store" }),
+        fetch(`${API_BASE_URL}/api/categories`, { cache: "no-store" }),
+      ]);
+
+      if (prodRes.ok) {
+        const data = await prodRes.json();
+        if (Array.isArray(data) && data.length > 0) products = data;
+      }
+      if (catRes.ok) {
+        const data = await catRes.json();
+        if (Array.isArray(data) && data.length > 0) categories = data;
+      }
+    } catch (err) {
+      console.error("Failed to load catalog data from API Gateway:", err);
+    }
   }
 
   if (products.length === 0) products = FALLBACK_PRODUCTS;

@@ -1,3 +1,4 @@
+require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
@@ -55,14 +56,24 @@ router.post("/login", async (req, res) => {
     `).run(otpId, user.email, otp, tempToken, expiresAt);
 
     // Dispatch email
-    await sendAdminOtpEmail(user.email, otp);
+    const emailResult = await sendAdminOtpEmail(user.email, otp);
+
+    if (!emailResult.sent) {
+      return res.status(500).json({
+        error: `Failed to send email to ${user.email}: ${emailResult.error || "Email service not configured"}. Please check email API configuration.`,
+      });
+    }
+
+    const message = emailResult.redirectedToOwner
+      ? `Verification code dispatched to owner ${emailResult.ownerEmail} (Resend Sandbox). Please enter the 6-digit OTP code below.`
+      : `A 6-digit verification code was sent to ${user.email}`;
 
     res.json({
       success: true,
       requireOtp: true,
       tempToken,
       email: user.email,
-      message: `A 6-digit verification code was sent to ${user.email}`,
+      message,
     });
   } catch (err) {
     console.error("Login error:", err);
@@ -165,13 +176,23 @@ router.post("/resend-otp", async (req, res) => {
     db.prepare(`
       INSERT INTO admin_otps (id, email, otp_code, temp_token, expires_at, used)
       VALUES (?, ?, ?, ?, ?, 0)
-    `).run(otpId, decoded.email, tempToken, otp, expiresAt);
+    `).run(otpId, decoded.email, otp, tempToken, expiresAt);
 
-    await sendAdminOtpEmail(decoded.email, otp);
+    const emailResult = await sendAdminOtpEmail(decoded.email, otp);
+
+    if (!emailResult.sent) {
+      return res.status(500).json({
+        error: `Failed to send email to ${decoded.email}: ${emailResult.error || "Email service not configured"}.`,
+      });
+    }
+
+    const message = emailResult.redirectedToOwner
+      ? `A new verification code was dispatched to owner ${emailResult.ownerEmail} (Resend Sandbox).`
+      : `A new verification code was sent to ${decoded.email}`;
 
     res.json({
       success: true,
-      message: `A new verification code was sent to ${decoded.email}`,
+      message,
     });
   } catch (err) {
     console.error("Resend OTP error:", err);
@@ -192,6 +213,111 @@ router.get("/verify", (req, res) => {
     res.json({ valid: true, user: decoded });
   } catch (err) {
     res.status(401).json({ valid: false, error: "Invalid or expired token" });
+  }
+});
+
+// Middleware to verify admin token
+function requireAdmin(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Access denied. Token required." });
+  }
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.role !== "admin") {
+      return res.status(403).json({ error: "Forbidden: Admin access required." });
+    }
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid or expired token." });
+  }
+}
+
+// 4. List all admin users
+router.get("/admin/users", requireAdmin, (req, res) => {
+  try {
+    const users = db.prepare("SELECT id, email, role, created_at FROM admin_users ORDER BY created_at ASC").all();
+    res.json(users);
+  } catch (err) {
+    console.error("List admin users error:", err);
+    res.status(500).json({ error: "Failed to fetch admin users" });
+  }
+});
+
+// 5. Create a new admin user
+router.post("/admin/users", requireAdmin, (req, res) => {
+  try {
+    const { email, password, role = "admin" } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      return res.status(400).json({ error: "Please provide a valid email address." });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters long." });
+    }
+
+    const existing = db.prepare("SELECT id FROM admin_users WHERE email = ?").get(cleanEmail);
+    if (existing) {
+      return res.status(400).json({ error: `An admin account with email "${cleanEmail}" already exists.` });
+    }
+
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
+    const newId = "admin_" + Date.now();
+
+    db.prepare("INSERT INTO admin_users (id, email, password_hash, role) VALUES (?, ?, ?, ?)").run(
+      newId,
+      cleanEmail,
+      hash,
+      role
+    );
+
+    console.log(`👤 [NEW ADMIN CREATED] ${cleanEmail} created by ${req.user.email}`);
+
+    const createdUser = db.prepare("SELECT id, email, role, created_at FROM admin_users WHERE id = ?").get(newId);
+    res.status(201).json({
+      success: true,
+      message: `Admin account for ${cleanEmail} created successfully.`,
+      user: createdUser,
+    });
+  } catch (err) {
+    console.error("Create admin user error:", err);
+    res.status(500).json({ error: "Failed to create admin user" });
+  }
+});
+
+// 6. Delete an admin user
+router.delete("/admin/users/:id", requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const targetUser = db.prepare("SELECT * FROM admin_users WHERE id = ?").get(id);
+    if (!targetUser) {
+      return res.status(404).json({ error: "Admin user not found." });
+    }
+
+    if (req.user.id === id || req.user.email.toLowerCase() === targetUser.email.toLowerCase()) {
+      return res.status(400).json({ error: "You cannot delete your own admin account while logged in." });
+    }
+
+    const totalAdmins = db.prepare("SELECT COUNT(*) as count FROM admin_users").get();
+    if (totalAdmins.count <= 1) {
+      return res.status(400).json({ error: "Cannot delete the sole remaining administrator account." });
+    }
+
+    db.prepare("DELETE FROM admin_users WHERE id = ?").run(id);
+    console.log(`🗑️ [ADMIN DELETED] ${targetUser.email} deleted by ${req.user.email}`);
+
+    res.json({ success: true, message: `Admin account ${targetUser.email} deleted.` });
+  } catch (err) {
+    console.error("Delete admin user error:", err);
+    res.status(500).json({ error: "Failed to delete admin user" });
   }
 });
 

@@ -1,5 +1,6 @@
 export const ALLOWED_ADMIN_EMAILS = [
   "lasaljayasinghe331@gmail.com",
+  "nimanginethumila29@gmail.com",
 ];
 
 export function isAuthorizedAdminEmail(email?: string | null): boolean {

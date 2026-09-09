@@ -18,10 +18,11 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:8080";
     return [
       {
         source: "/uploads/:path*",
-        destination: "http://localhost:8080/uploads/:path*",
+        destination: `${backendUrl}/uploads/:path*`,
       },
     ];
   },

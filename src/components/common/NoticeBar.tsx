@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { API_BASE_URL } from "@/lib/config";
 
 interface Notice {
   notice_text: string;
@@ -12,7 +13,7 @@ export default function NoticeBar() {
   const [notice, setNotice] = useState<Notice | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/notice")
+    fetch(`${API_BASE_URL}/api/notice`)
       .then((res) => res.json())
       .then((data) => {
         if (data && data.is_active) {

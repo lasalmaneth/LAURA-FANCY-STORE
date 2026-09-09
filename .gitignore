@@ -4,11 +4,28 @@ out/
 build/
 node_modules/
 
-# Environment Variables
+# Environment Variables (CRITICAL SECURITY)
+.env
 .env.local
+.env.*.local
 .env.development.local
 .env.test.local
 .env.production.local
+backend/.env
+backend/.env.*
+!.env.example
+!backend/.env.example
+
+# SQLite Database Files & WAL
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+backend/database/*.db-shm
+backend/database/*.db-wal
+
+# Build Artifacts
+admin-frontend/dist/
 
 # macOS
 .DS_Store

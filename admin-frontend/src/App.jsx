@@ -18,6 +18,10 @@ import {
   KeyRound,
   ArrowLeft,
   Mail,
+  Users,
+  UserPlus,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 export default function App() {
@@ -62,6 +66,12 @@ export default function App() {
 
   const [categoryForm, setCategoryForm] = useState({ name: "", slug: "" });
 
+  // Admin Team state
+  const [adminUsers, setAdminUsers] = useState([]);
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [adminForm, setAdminForm] = useState({ email: "", password: "", showPassword: false });
+  const [adminSaving, setAdminSaving] = useState(false);
+
   // Login form & 2FA state
   const [loginStep, setLoginStep] = useState("credentials"); // "credentials" | "otp"
   const [loginForm, setLoginForm] = useState({ email: "lasaljayasinghe331@gmail.com", password: "" });
@@ -73,20 +83,33 @@ export default function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resendSuccess, setResendSuccess] = useState("");
 
+  const fetchAdminUsers = async () => {
+    try {
+      const data = await api.getAdminUsers();
+      if (Array.isArray(data)) {
+        setAdminUsers(data);
+      }
+    } catch (err) {
+      console.error("Failed to load admin users:", err);
+    }
+  };
+
   const loadAllData = async () => {
     if (!auth.isAuthenticated()) return;
     setLoading(true);
     try {
-      const [statsData, prodsData, catsData, noticeData] = await Promise.all([
+      const [statsData, prodsData, catsData, noticeData, adminData] = await Promise.all([
         api.getStats().catch(() => ({ total: 0, inStock: 0, outOfStock: 0, categoriesCount: 0 })),
-        api.getProducts(),
-        api.getCategories(),
+        api.getProducts().catch(() => []),
+        api.getCategories().catch(() => []),
         api.getNotice().catch(() => null),
+        api.getAdminUsers().catch(() => []),
       ]);
-      setStats(statsData);
-      setProducts(prodsData);
-      setCategories(catsData);
+      if (statsData) setStats(statsData);
+      if (prodsData) setProducts(prodsData);
+      if (catsData) setCategories(catsData);
       if (noticeData) setNotice(noticeData);
+      if (adminData && Array.isArray(adminData)) setAdminUsers(adminData);
     } catch (err) {
       console.error(err);
       setFeedback({ type: "error", message: err.message });
@@ -100,6 +123,13 @@ export default function App() {
       loadAllData();
     }
   }, [isAuthenticated]);
+
+  // Automatically refresh admin users when switching to the Admin Team tab
+  useEffect(() => {
+    if (activeTab === "admins" && isAuthenticated) {
+      fetchAdminUsers();
+    }
+  }, [activeTab, isAuthenticated]);
 
   // Countdown timer for OTP resend
   useEffect(() => {
@@ -122,8 +152,8 @@ export default function App() {
       if (res.requireOtp) {
         setTempToken(res.tempToken);
         setOtpEmail(res.email);
+        setOtp(""); // always empty for manual entry from email
         setLoginStep("otp");
-        setOtp("");
         setOtpTimer(60);
       } else if (res.token) {
         setIsAuthenticated(true);
@@ -164,9 +194,10 @@ export default function App() {
     setResendSuccess("");
     setIsSubmitting(true);
     try {
-      await api.resendOtp(tempToken);
+      const res = await api.resendOtp(tempToken);
       setOtpTimer(60);
-      setResendSuccess("A new 6-digit verification code has been dispatched to your email.");
+      setOtp(""); // keep input empty for manual entry
+      setResendSuccess(res.message || "A new 6-digit verification code has been dispatched to your email.");
     } catch (err) {
       setLoginError(err.message || "Failed to resend verification code.");
     } finally {
@@ -178,6 +209,47 @@ export default function App() {
     auth.logout();
     setIsAuthenticated(false);
     setUser(null);
+  };
+
+  const handleCreateAdmin = async (e) => {
+    e.preventDefault();
+    if (!adminForm.email || !adminForm.password) {
+      setFeedback({ type: "error", message: "Please provide both email and password." });
+      return;
+    }
+    if (adminForm.password.length < 6) {
+      setFeedback({ type: "error", message: "Password must be at least 6 characters long." });
+      return;
+    }
+    setAdminSaving(true);
+    try {
+      const res = await api.createAdminUser({
+        email: adminForm.email.trim(),
+        password: adminForm.password,
+        role: "admin",
+      });
+      setFeedback({ type: "success", message: res.message || `Admin account created for ${adminForm.email}!` });
+      setShowAdminModal(false);
+      setAdminForm({ email: "", password: "", showPassword: false });
+      fetchAdminUsers();
+    } catch (err) {
+      setFeedback({ type: "error", message: err.message || "Failed to create admin account" });
+      fetchAdminUsers();
+    } finally {
+      setAdminSaving(false);
+    }
+  };
+
+  const handleDeleteAdmin = async (id, email) => {
+    if (!window.confirm(`Are you sure you want to revoke admin access for ${email}?`)) return;
+    try {
+      await api.deleteAdminUser(id);
+      setFeedback({ type: "success", message: `Admin access revoked for ${email}.` });
+      const updatedAdmins = await api.getAdminUsers();
+      setAdminUsers(updatedAdmins);
+    } catch (err) {
+      setFeedback({ type: "error", message: err.message || "Failed to revoke admin access" });
+    }
   };
 
   const [imageSlots, setImageSlots] = useState([
@@ -462,6 +534,9 @@ export default function App() {
                   A 6-digit verification code was sent to <br />
                   <strong style={{ color: "#0f172a" }}>{otpEmail || loginForm.email}</strong>
                 </p>
+                <p style={{ fontSize: "12px", color: "#94a3b8", margin: "6px 0 0 0" }}>
+                  Please check your Gmail inbox and enter the code below to complete sign in.
+                </p>
               </div>
 
               {loginError && (
@@ -594,6 +669,13 @@ export default function App() {
           >
             <Megaphone size={18} />
             Store Notice & Promos
+          </button>
+          <button
+            className={`nav-item ${activeTab === "admins" ? "active" : ""}`}
+            onClick={() => setActiveTab("admins")}
+          >
+            <Users size={18} />
+            Admin Team ({adminUsers.length})
           </button>
         </nav>
 
@@ -1107,6 +1189,103 @@ export default function App() {
               </form>
             </div>
           )}
+
+          {/* TAB 6: ADMIN TEAM */}
+          {activeTab === "admins" && (
+            <div className="table-card">
+              <div className="table-header">
+                <div>
+                  <h3>Authorized Administrators</h3>
+                  <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+                    Team members who have full access to this inventory and store management dashboard.
+                  </span>
+                </div>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={fetchAdminUsers}
+                    title="Refresh administrator list"
+                    type="button"
+                  >
+                    <RefreshCw size={16} /> Refresh
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      setAdminForm({ email: "", password: "", showPassword: false });
+                      setShowAdminModal(true);
+                    }}
+                    type="button"
+                  >
+                    <UserPlus size={16} /> Add Administrator
+                  </button>
+                </div>
+              </div>
+
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Email Address</th>
+                    <th>Role</th>
+                    <th>Date Added</th>
+                    <th>Security Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adminUsers.map((adm) => {
+                    const isCurrentUser = user && (adm.id === user.id || adm.email?.toLowerCase() === user.email?.toLowerCase());
+                    return (
+                      <tr key={adm.id}>
+                        <td>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <strong>{adm.email}</strong>
+                            {isCurrentUser && (
+                              <span style={{ fontSize: "10px", background: "#e0e7ff", color: "#4338ca", padding: "2px 8px", borderRadius: "12px", fontWeight: "bold" }}>
+                                Current User
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <span className="sidebar-badge" style={{ textTransform: "uppercase" }}>
+                            {adm.role || "Admin"}
+                          </span>
+                        </td>
+                        <td>
+                          {adm.created_at ? new Date(adm.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Default"}
+                        </td>
+                        <td>
+                          <span className="badge badge-success">2FA Enabled</span>
+                        </td>
+                        <td>
+                          {isCurrentUser ? (
+                            <span style={{ fontSize: "12px", color: "var(--text-muted)", fontStyle: "italic" }}>
+                              Active Session
+                            </span>
+                          ) : (
+                            <button
+                              className="btn-danger-sm"
+                              onClick={() => handleDeleteAdmin(adm.id, adm.email)}
+                            >
+                              Revoke Access
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {adminUsers.length === 0 && (
+                    <tr>
+                      <td colSpan={5} style={{ textAlign: "center", padding: "24px", color: "var(--text-muted)" }}>
+                        No additional administrators found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </main>
 
@@ -1394,6 +1573,111 @@ export default function App() {
                 </button>
                 <button type="submit" className="btn btn-primary">
                   {editingProduct ? "Save Changes" : "Create Product"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ---------------- ADD ADMIN MODAL ---------------- */}
+      {showAdminModal && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: "480px" }}>
+            <div className="modal-header">
+              <h3>Add New Administrator</h3>
+              <button
+                className="modal-close"
+                onClick={() => setShowAdminModal(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <form onSubmit={handleCreateAdmin}>
+              <div style={{ padding: "24px" }}>
+                <p style={{ fontSize: "13px", color: "var(--text-muted)", marginTop: 0, marginBottom: "20px", lineHeight: "1.5" }}>
+                  Enter the email address and initial password for the new admin. Once added, they can log in to this exact dashboard and will receive 2FA security OTPs directly to their email.
+                </p>
+
+                <div className="form-group" style={{ marginBottom: "16px" }}>
+                  <label className="form-label">Administrator Email *</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    placeholder="e.g. colleague@gmail.com"
+                    value={adminForm.email}
+                    onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: "16px" }}>
+                  <label className="form-label">Initial Password * (min 6 characters)</label>
+                  <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                    <input
+                      type={adminForm.showPassword ? "text" : "password"}
+                      className="form-input"
+                      placeholder="Enter secure password"
+                      value={adminForm.password}
+                      onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
+                      required
+                      minLength={6}
+                      style={{ paddingRight: "40px" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setAdminForm({ ...adminForm, showPassword: !adminForm.showPassword })}
+                      style={{
+                        position: "absolute",
+                        right: "10px",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        color: "var(--text-muted)",
+                        display: "flex",
+                        alignItems: "center"
+                      }}
+                    >
+                      {adminForm.showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Admin Role & Privileges</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value="Full Admin Access (Catalog, Inventory, Orders, Settings)"
+                    disabled
+                    style={{ background: "#f1f5f9", color: "#64748b", cursor: "not-allowed" }}
+                  />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  padding: "16px 24px",
+                  borderTop: "1px solid var(--border-color)",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "12px",
+                }}
+              >
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowAdminModal(false)}
+                  disabled={adminSaving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={adminSaving}
+                >
+                  {adminSaving ? "Creating Admin..." : "Add Administrator →"}
                 </button>
               </div>
             </form>

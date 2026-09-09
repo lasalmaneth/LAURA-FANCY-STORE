@@ -1,6 +1,14 @@
 const nodemailer = require("nodemailer");
 
-// Create Nodemailer Transporter
+// Initialize Resend if available
+let ResendClass = null;
+try {
+  const resendPkg = require("resend");
+  ResendClass = resendPkg.Resend;
+} catch (e) {
+  // resend package not found
+}
+
 function getTransporter() {
   const host = process.env.SMTP_HOST || "smtp.gmail.com";
   const port = parseInt(process.env.SMTP_PORT || "465", 10);
@@ -8,9 +16,7 @@ function getTransporter() {
   const user = process.env.SMTP_USER || "laurafancystore@gmail.com";
   const pass = process.env.SMTP_PASS;
 
-  if (!pass) {
-    return null; // SMTP password not configured yet
-  }
+  if (!pass) return null;
 
   return nodemailer.createTransport({
     host,
@@ -24,28 +30,10 @@ function getTransporter() {
 }
 
 /**
- * Send 6-digit OTP code to the administrator
- * @param {string} toEmail 
- * @param {string} otpCode 
+ * Generate branded HTML for OTP email
  */
-async function sendAdminOtpEmail(toEmail, otpCode) {
-  console.log("\n========================================================");
-  console.log("🔐 [ADMIN TWO-FACTOR AUTHENTICATION]");
-  console.log(`📧 Recipient: ${toEmail}`);
-  console.log(`🔑 6-Digit OTP Code: >>> ${otpCode} <<<`);
-  console.log("⏳ Validity: 10 Minutes");
-  console.log("========================================================\n");
-
-  const transporter = getTransporter();
-  if (!transporter) {
-    console.log("ℹ️ Note: SMTP_PASS not found in backend/.env. OTP displayed in console above for instant use.");
-    return { sent: false, reason: "SMTP not configured" };
-  }
-
-  const senderEmail = process.env.SMTP_USER || "laurafancystore@gmail.com";
-  const subject = `${otpCode} is your Laura Fancy Store Admin verification code`;
-
-  const html = `
+function getOtpHtml(toEmail, otpCode) {
+  return `
     <!DOCTYPE html>
     <html>
       <head>
@@ -88,21 +76,144 @@ async function sendAdminOtpEmail(toEmail, otpCode) {
       </body>
     </html>
   `;
+}
 
-  try {
-    const info = await transporter.sendMail({
-      from: `"Laura Fancy Store Security" <${senderEmail}>`,
-      to: toEmail,
-      subject,
-      text: `Your Laura Fancy Store Admin verification code is: ${otpCode}. It is valid for 10 minutes.`,
-      html,
-    });
-    console.log(`✅ [EMAIL SENT] OTP successfully sent to ${toEmail}. MessageId: ${info.messageId}`);
-    return { sent: true, messageId: info.messageId };
-  } catch (error) {
-    console.error(`⚠️ [EMAIL ERROR] Could not deliver email via SMTP:`, error.message);
-    return { sent: false, error: error.message };
+/**
+ * Send 6-digit OTP code to the administrator
+ * @param {string} toEmail 
+ * @param {string} otpCode 
+ */
+async function sendAdminOtpEmail(toEmail, otpCode) {
+  const subject = `${otpCode} is your Laura Fancy Store Admin verification code`;
+  const text = `Your Laura Fancy Store Admin verification code is: ${otpCode}. It is valid for 10 minutes.`;
+  const html = getOtpHtml(toEmail, otpCode);
+
+  // 1. Check Resend API
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (resendApiKey && ResendClass) {
+    try {
+      const resend = new ResendClass(resendApiKey);
+      const sender = process.env.RESEND_FROM || "Laura Fancy Store <onboarding@resend.dev>";
+      const result = await resend.emails.send({
+        from: sender,
+        to: toEmail,
+        subject,
+        html,
+        text,
+      });
+
+      if (result.error) {
+        console.error("⚠️ [RESEND ERROR]:", result.error);
+        const errMsg = result.error.message || JSON.stringify(result.error);
+        
+        // If Resend is in free testing mode and blocks sending to other recipients
+        if (errMsg.includes("only send testing emails to your own email address") || errMsg.includes("testing emails")) {
+          const ownerEmail = "lasaljayasinghe331@gmail.com";
+          console.log(`⚠️ [RESEND SANDBOX] Direct delivery to ${toEmail} restricted. Routing OTP to primary account owner ${ownerEmail}...`);
+          
+          try {
+            const forwardSubject = `[Admin OTP for ${toEmail}] ${otpCode} is the verification code`;
+            const forwardHtml = `
+              <div style="font-family: sans-serif; padding: 20px; color: #111;">
+                <h2>Laura Fancy Store — Admin Sign-In Request</h2>
+                <p>An administrator sign-in was requested for: <strong>${toEmail}</strong></p>
+                <p><em>Note: Your Resend account is currently in test mode, so this verification email was routed to the primary account owner (${ownerEmail}).</em></p>
+                <div style="background: #f4f4f4; border: 2px dashed #333; padding: 16px 24px; border-radius: 8px; display: inline-block; margin: 16px 0;">
+                  <span style="font-size: 32px; font-weight: bold; letter-spacing: 6px;">${otpCode}</span>
+                </div>
+                <p style="color: #666; font-size: 13px;">To send directly to ${toEmail}'s inbox in the future, verify your domain at <a href="https://resend.com/domains">resend.com/domains</a> or configure a Gmail App Password in <code>backend/.env</code>.</p>
+              </div>
+            `;
+            const forwardResult = await resend.emails.send({
+              from: sender,
+              to: ownerEmail,
+              subject: forwardSubject,
+              html: forwardHtml,
+              text: `Admin verification code for ${toEmail} is: ${otpCode}. Routed to ${ownerEmail} due to Resend test sandbox.`,
+            });
+            
+            if (!forwardResult.error) {
+              console.log(`✅ [OTP ROUTED TO OWNER via Resend] Delivered to ${ownerEmail} for ${toEmail}`);
+              return { sent: true, redirectedToOwner: true, ownerEmail, messageId: forwardResult.data?.id };
+            }
+          } catch (fErr) {
+            console.error("⚠️ [FORWARD ERROR]:", fErr.message);
+          }
+        }
+
+        return { sent: false, error: errMsg };
+      }
+
+      console.log(`✅ [EMAIL SENT via Resend] Message ID: ${result.data?.id}`);
+      return { sent: true, messageId: result.data?.id };
+    } catch (err) {
+      console.error("⚠️ [RESEND EXCEPTION]:", err.message);
+      return { sent: false, error: err.message };
+    }
   }
+
+  // 2. Check Brevo API
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  if (brevoApiKey) {
+    try {
+      const senderEmail = process.env.BREVO_SENDER_EMAIL || "laurafancystore@gmail.com";
+      const senderName = process.env.BREVO_SENDER_NAME || "Laura Fancy Store";
+
+      const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": brevoApiKey,
+        },
+        body: JSON.stringify({
+          sender: { name: senderName, email: senderEmail },
+          to: [{ email: toEmail }],
+          subject,
+          htmlContent: html,
+          textContent: text,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        console.error("⚠️ [BREVO ERROR]:", data);
+        return { sent: false, error: data.message || "Failed to send via Brevo" };
+      }
+
+      console.log(`✅ [EMAIL SENT via Brevo] Message ID: ${data.messageId}`);
+      return { sent: true, messageId: data.messageId };
+    } catch (err) {
+      console.error("⚠️ [BREVO EXCEPTION]:", err.message);
+      return { sent: false, error: err.message };
+    }
+  }
+
+  // 3. Check Nodemailer SMTP
+  const transporter = getTransporter();
+  if (transporter) {
+    try {
+      const senderEmail = process.env.SMTP_USER || "laurafancystore@gmail.com";
+      const info = await transporter.sendMail({
+        from: `"Laura Fancy Store Security" <${senderEmail}>`,
+        to: toEmail,
+        subject,
+        text,
+        html,
+      });
+      console.log(`✅ [EMAIL SENT via SMTP] Message ID: ${info.messageId}`);
+      return { sent: true, messageId: info.messageId };
+    } catch (error) {
+      console.error(`⚠️ [SMTP ERROR]:`, error.message);
+      return { sent: false, error: error.message };
+    }
+  }
+
+  // If no email service is configured
+  console.error("❌ [EMAIL CONFIG ERROR] No email service configured. Please provide RESEND_API_KEY, BREVO_API_KEY, or SMTP_PASS in backend/.env.");
+  return {
+    sent: false,
+    error: "No email API key or SMTP password configured. Please provide your API key (e.g. Resend, Brevo, or Gmail App Password).",
+  };
 }
 
 module.exports = {

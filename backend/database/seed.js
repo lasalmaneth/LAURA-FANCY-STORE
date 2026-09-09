@@ -31,6 +31,19 @@ function seed() {
     console.log("  👤 Seeded admin user: lasaljayasinghe331@gmail.com");
   }
 
+  const nimangiAdmin = db.prepare("SELECT * FROM admin_users WHERE email = ?").get("nimanginethumila29@gmail.com");
+  if (!nimangiAdmin) {
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync("Nimangee+8888L", salt);
+    db.prepare("INSERT INTO admin_users (id, email, password_hash, role) VALUES (?, ?, ?, ?)").run(
+      "admin_nimangi",
+      "nimanginethumila29@gmail.com",
+      hash,
+      "admin"
+    );
+    console.log("  👤 Seeded admin user: nimanginethumila29@gmail.com");
+  }
+
   // Seed Categories
   const categories = [
     { id: "cat-1", name: "Household & Living", slug: "household-living" },

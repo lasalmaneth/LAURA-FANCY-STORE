@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import WhatsAppButton from "@/components/products/WhatsAppButton";
+import { API_BASE_URL } from "@/lib/config";
 import { Product } from "@/lib/types";
 
 const FALLBACK_PRODUCTS: Record<string, Product> = {
@@ -88,7 +89,7 @@ export async function generateMetadata({
   const { slug } = await params;
   let product: Product | null = null;
   try {
-    const res = await fetch(`http://localhost:8080/api/products/${slug}`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE_URL}/api/products/${slug}`, { cache: "no-store" });
     if (res.ok) product = await res.json();
   } catch (err) {
     console.error("Failed to load product metadata from API Gateway:", err);
@@ -114,7 +115,7 @@ export default async function ProductDetailPage({
   let product: Product | null = null;
 
   try {
-    const res = await fetch(`http://localhost:8080/api/products/${slug}`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE_URL}/api/products/${slug}`, { cache: "no-store" });
     if (res.ok) product = await res.json();
   } catch (err) {
     console.error("Failed to load product detail from API Gateway:", err);

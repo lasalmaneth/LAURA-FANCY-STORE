@@ -105,6 +105,15 @@ app.use(
   })
 );
 
+app.use(
+  "/api/admin/users",
+  requireAdminAuth,
+  createProxyMiddleware({
+    target: `${SERVICES.auth}/admin/users`,
+    changeOrigin: true,
+  })
+);
+
 // ---------------- PUBLIC CUSTOMER & READ ROUTES ----------------
 app.use(
   "/api/products",
