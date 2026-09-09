@@ -14,6 +14,10 @@ import {
   Upload,
   RefreshCw,
   Megaphone,
+  ShieldCheck,
+  KeyRound,
+  ArrowLeft,
+  Mail,
 } from "lucide-react";
 
 export default function App() {
@@ -58,9 +62,16 @@ export default function App() {
 
   const [categoryForm, setCategoryForm] = useState({ name: "", slug: "" });
 
-  // Login form state
-  const [loginForm, setLoginForm] = useState({ email: "admin@laurafancystore.com", password: "admin123" });
+  // Login form & 2FA state
+  const [loginStep, setLoginStep] = useState("credentials"); // "credentials" | "otp"
+  const [loginForm, setLoginForm] = useState({ email: "lasaljayasinghe331@gmail.com", password: "" });
   const [loginError, setLoginError] = useState("");
+  const [tempToken, setTempToken] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpEmail, setOtpEmail] = useState("");
+  const [otpTimer, setOtpTimer] = useState(60);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState("");
 
   const loadAllData = async () => {
     if (!auth.isAuthenticated()) return;
@@ -90,15 +101,76 @@ export default function App() {
     }
   }, [isAuthenticated]);
 
+  // Countdown timer for OTP resend
+  useEffect(() => {
+    let interval = null;
+    if (loginStep === "otp" && otpTimer > 0) {
+      interval = setInterval(() => {
+        setOtpTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [loginStep, otpTimer]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError("");
+    setResendSuccess("");
+    setIsSubmitting(true);
     try {
       const res = await api.login(loginForm.email, loginForm.password);
-      setIsAuthenticated(true);
-      setUser(res.user);
+      if (res.requireOtp) {
+        setTempToken(res.tempToken);
+        setOtpEmail(res.email);
+        setLoginStep("otp");
+        setOtp("");
+        setOtpTimer(60);
+      } else if (res.token) {
+        setIsAuthenticated(true);
+        setUser(res.user);
+      }
     } catch (err) {
       setLoginError(err.message || "Failed to log in");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (!otp || otp.length !== 6) {
+      setLoginError("Please enter the complete 6-digit verification code.");
+      return;
+    }
+    setLoginError("");
+    setResendSuccess("");
+    setIsSubmitting(true);
+    try {
+      const res = await api.verifyOtp(tempToken, otp);
+      if (res.success && res.token) {
+        setIsAuthenticated(true);
+        setUser(res.user);
+      }
+    } catch (err) {
+      setLoginError(err.message || "Invalid or expired verification code.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (otpTimer > 0 || isSubmitting) return;
+    setLoginError("");
+    setResendSuccess("");
+    setIsSubmitting(true);
+    try {
+      await api.resendOtp(tempToken);
+      setOtpTimer(60);
+      setResendSuccess("A new 6-digit verification code has been dispatched to your email.");
+    } catch (err) {
+      setLoginError(err.message || "Failed to resend verification code.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -310,7 +382,7 @@ export default function App() {
     }
   };
 
-  // ---------------- LOGIN VIEW ----------------
+  // ---------------- LOGIN VIEW (WITH 2FA OTP) ----------------
   if (!isAuthenticated) {
     return (
       <div className="login-container">
@@ -322,39 +394,151 @@ export default function App() {
               <span className="sidebar-badge">ADMIN ACCESS</span>
             </div>
           </div>
-          <p className="login-subtitle">Enter your administrator credentials to access the central inventory management portal.</p>
 
-          {loginError && (
-            <div style={{ background: "#fee2e2", color: "#b91c1c", padding: "10px", borderRadius: "8px", fontSize: "13px", marginBottom: "16px" }}>
-              {loginError}
-            </div>
+          {loginStep === "credentials" ? (
+            <>
+              <p className="login-subtitle">
+                Enter your administrator credentials to access the central inventory management portal.
+              </p>
+
+              {loginError && (
+                <div style={{ background: "#fee2e2", color: "#b91c1c", padding: "10px 12px", borderRadius: "8px", fontSize: "13px", marginBottom: "16px" }}>
+                  {loginError}
+                </div>
+              )}
+
+              <form onSubmit={handleLogin}>
+                <div className="form-group">
+                  <label className="form-label">Admin Email</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    value={loginForm.email}
+                    onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                    placeholder="name@example.com"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Password</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSubmitting}
+                  style={{ width: "100%", justifyContent: "center", padding: "12px" }}
+                >
+                  {isSubmitting ? "Authenticating..." : "Sign In with Email OTP →"}
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <div style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "50%",
+                  background: "#f0fdf4",
+                  color: "#16a34a",
+                  marginBottom: "12px",
+                  border: "1px solid #bbf7d0"
+                }}>
+                  <ShieldCheck size={26} />
+                </div>
+                <h2 style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", margin: "0 0 6px 0" }}>Two-Factor Authentication</h2>
+                <p style={{ fontSize: "13px", color: "#64748b", margin: 0, lineHeight: "1.5" }}>
+                  A 6-digit verification code was sent to <br />
+                  <strong style={{ color: "#0f172a" }}>{otpEmail || loginForm.email}</strong>
+                </p>
+              </div>
+
+              {loginError && (
+                <div style={{ background: "#fee2e2", color: "#b91c1c", padding: "10px 12px", borderRadius: "8px", fontSize: "13px", marginBottom: "16px", textAlign: "center" }}>
+                  {loginError}
+                </div>
+              )}
+
+              {resendSuccess && (
+                <div style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0", padding: "10px 12px", borderRadius: "8px", fontSize: "13px", marginBottom: "16px", textAlign: "center" }}>
+                  {resendSuccess}
+                </div>
+              )}
+
+              <form onSubmit={handleVerifyOtp}>
+                <div className="form-group" style={{ marginBottom: "20px" }}>
+                  <label className="form-label" style={{ textAlign: "center", display: "block" }}>Enter 6-Digit OTP</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    className="form-input"
+                    style={{
+                      textAlign: "center",
+                      letterSpacing: "10px",
+                      fontSize: "26px",
+                      fontWeight: "700",
+                      fontFamily: "monospace",
+                      padding: "12px 16px",
+                      borderRadius: "10px",
+                    }}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ""))}
+                    placeholder="••••••"
+                    autoFocus
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSubmitting || otp.length !== 6}
+                  style={{ width: "100%", justifyContent: "center", padding: "12px", marginBottom: "16px" }}
+                >
+                  {isSubmitting ? "Verifying Code..." : "Verify & Enter Admin Console →"}
+                </button>
+
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", color: "#64748b", borderTop: "1px solid #f1f5f9", paddingTop: "14px" }}>
+                  <button
+                    type="button"
+                    onClick={() => { setLoginStep("credentials"); setLoginError(""); setResendSuccess(""); }}
+                    style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", padding: 0 }}
+                  >
+                    <ArrowLeft size={14} /> Back
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={otpTimer > 0 || isSubmitting}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: otpTimer > 0 ? "#94a3b8" : "#2563eb",
+                      fontWeight: "600",
+                      cursor: otpTimer > 0 ? "not-allowed" : "pointer",
+                      padding: 0
+                    }}
+                  >
+                    {otpTimer > 0 ? `Resend code in ${otpTimer}s` : "Resend Code"}
+                  </button>
+                </div>
+              </form>
+            </>
           )}
-
-          <form onSubmit={handleLogin}>
-            <div className="form-group">
-              <label className="form-label">Admin Email</label>
-              <input
-                type="email"
-                className="form-input"
-                value={loginForm.email}
-                onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Password</label>
-              <input
-                type="password"
-                className="form-input"
-                value={loginForm.password}
-                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                required
-              />
-            </div>
-            <button type="submit" className="btn btn-primary" style={{ width: "100%", justifyContent: "center", padding: "12px" }}>
-              Sign In to Admin Portal
-            </button>
-          </form>
         </div>
       </div>
     );

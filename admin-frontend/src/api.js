@@ -33,7 +33,7 @@ async function request(endpoint, options = {}) {
     headers,
   });
 
-  if (res.status === 401) {
+  if (res.status === 401 && !endpoint.startsWith("/api/auth")) {
     auth.logout();
     window.location.reload();
     throw new Error("Session expired. Please log in again.");
@@ -58,6 +58,25 @@ export const api = {
       auth.setUser(data.user);
     }
     return data;
+  },
+
+  verifyOtp: async (tempToken, otp) => {
+    const data = await request("/api/auth/verify-otp", {
+      method: "POST",
+      body: JSON.stringify({ tempToken, otp }),
+    });
+    if (data.token) {
+      auth.setToken(data.token);
+      auth.setUser(data.user);
+    }
+    return data;
+  },
+
+  resendOtp: async (tempToken) => {
+    return request("/api/auth/resend-otp", {
+      method: "POST",
+      body: JSON.stringify({ tempToken }),
+    });
   },
 
   // Stats

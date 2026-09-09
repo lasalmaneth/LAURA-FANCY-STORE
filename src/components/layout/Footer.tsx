@@ -39,12 +39,6 @@ export default function Footer() {
           >
             Contact
           </Link>
-          <Link
-            href="/admin"
-            className="text-paper/50 hover:text-paper text-[10px] tracking-[0.2em] uppercase transition-colors"
-          >
-            Admin Portal
-          </Link>
         </div>
       </div>
       <div className="flex flex-col sm:flex-row justify-between items-center text-[10px] tracking-wider text-paper/30 gap-2">

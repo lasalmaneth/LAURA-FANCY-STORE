@@ -73,6 +73,16 @@ db.exec(`
     role TEXT DEFAULT 'admin',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS admin_otps (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    otp_code TEXT NOT NULL,
+    temp_token TEXT NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 module.exports = db;

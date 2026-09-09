@@ -165,9 +165,6 @@ export default async function ProductsCatalogPage({
   return (
     <div className="pt-28 pb-24 min-h-screen">
       <div className="px-6 md:px-12 mb-12">
-        <span className="font-mono text-[10px] tracking-[0.2em] text-grey uppercase block mb-2">
-          // SHOP ALL PRODUCTS
-        </span>
         <h1 className="font-display text-5xl md:text-7xl tracking-wider">STORE CATALOG</h1>
         <div className="w-full h-[2px] bg-ink mt-4" />
       </div>

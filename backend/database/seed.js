@@ -18,6 +18,19 @@ function seed() {
     console.log("  👤 Seeded default admin user: admin@laurafancystore.com (password: admin123)");
   }
 
+  const lasalAdmin = db.prepare("SELECT * FROM admin_users WHERE email = ?").get("lasaljayasinghe331@gmail.com");
+  if (!lasalAdmin) {
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync("Hasantha@123", salt);
+    db.prepare("INSERT INTO admin_users (id, email, password_hash, role) VALUES (?, ?, ?, ?)").run(
+      "admin_lasal",
+      "lasaljayasinghe331@gmail.com",
+      hash,
+      "admin"
+    );
+    console.log("  👤 Seeded admin user: lasaljayasinghe331@gmail.com");
+  }
+
   // Seed Categories
   const categories = [
     { id: "cat-1", name: "Household & Living", slug: "household-living" },
