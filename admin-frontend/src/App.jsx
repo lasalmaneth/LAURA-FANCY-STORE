@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { api, auth } from "./api";
+import { api, auth, API_BASE } from "./api";
+
+const resolveImageUrl = (img) => {
+  if (!img) return "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=300&auto=format&fit=crop";
+  const url = typeof img === "string" ? img : img?.image_url || img?.image;
+  if (!url) return "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=300&auto=format&fit=crop";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  const base = (API_BASE || "").replace(/\/$/, "");
+  return `${base}${url.startsWith("/") ? "" : "/"}${url}`;
+};
 import {
   LayoutDashboard,
   Package,
@@ -327,11 +336,7 @@ export default function App() {
       return {
         slot: slotNum,
         file: null,
-        preview: found
-          ? found.image_url.startsWith("http")
-            ? found.image_url
-            : `http://localhost:8080${found.image_url}`
-          : null,
+        preview: found ? resolveImageUrl(found.image_url) : null,
         existingUrl: found ? found.image_url : null,
         cleared: false,
       };
@@ -801,11 +806,11 @@ export default function App() {
                       <tr key={p.id}>
                         <td>
                           <img
-                            src={p.images?.[0]?.image_url ? `http://localhost:8080${p.images[0].image_url}` : "/placeholder.png"}
+                            src={resolveImageUrl(p.images?.[0] || p.image)}
                             alt={p.name}
                             className="prod-thumb"
                             onError={(e) => {
-                              e.target.src = "http://localhost:8080/uploads/products/vacuum-flask-set.jpg";
+                              e.target.src = "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=300&auto=format&fit=crop";
                             }}
                           />
                         </td>
@@ -837,7 +842,7 @@ export default function App() {
                             Rs. {p.price.toLocaleString("en-US")}
                           </span>
                         </td>
-                        <td>{p.category?.name || "—"}</td>
+                        <td>{p.categories?.name || p.category?.name || categories.find((c) => c.id === p.category_id)?.name || "—"}</td>
                         <td>
                           <span className={`badge ${p.stock_status === "in_stock" ? "badge-success" : "badge-danger"}`}>
                             {p.stock_status === "in_stock" ? "In Stock" : "Out of Stock"}
@@ -885,11 +890,11 @@ export default function App() {
                     <tr key={p.id}>
                       <td>
                         <img
-                          src={p.images?.[0]?.image_url ? `http://localhost:8080${p.images[0].image_url}` : "/placeholder.png"}
+                          src={resolveImageUrl(p.images?.[0] || p.image)}
                           alt={p.name}
                           className="prod-thumb"
                           onError={(e) => {
-                            e.target.src = "http://localhost:8080/uploads/products/vacuum-flask-set.jpg";
+                            e.target.src = "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=300&auto=format&fit=crop";
                           }}
                         />
                       </td>
@@ -919,7 +924,7 @@ export default function App() {
                       <td>
                         <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px" }}>{p.product_code}</span>
                       </td>
-                      <td>{p.category?.name || "Uncategorized"}</td>
+                      <td>{p.categories?.name || p.category?.name || categories.find((c) => c.id === p.category_id)?.name || "Uncategorized"}</td>
                       <td>
                         <span style={{ fontFamily: "var(--font-mono)", fontWeight: "bold" }}>
                           Rs. {p.price.toLocaleString("en-US")}

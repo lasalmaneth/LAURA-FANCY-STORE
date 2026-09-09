@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       // Process uploaded files into Supabase Storage
       const files: File[] = [];
       formData.forEach((value, key) => {
-        if ((key === "images" || key === "image") && value instanceof File && value.size > 0) {
+        if ((key === "images" || key === "image" || key.startsWith("image_") || key.startsWith("image")) && value instanceof File && value.size > 0) {
           files.push(value);
         }
       });

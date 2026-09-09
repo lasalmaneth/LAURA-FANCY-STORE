@@ -42,7 +42,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       const files: File[] = [];
       formData.forEach((value, key) => {
-        if ((key === "images" || key === "image") && value instanceof File && value.size > 0) {
+        if ((key === "images" || key === "image" || key.startsWith("image_") || key.startsWith("image")) && value instanceof File && value.size > 0) {
           files.push(value);
         }
       });
@@ -96,13 +96,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500, headers: corsHeaders() });
 
-    for (const url of newImageUrls) {
-      await supabase.from("product_images").insert({
-        product_id: id,
-        image_url: url,
-        storage_path: url,
-        sort_order: 1,
-      });
+    if (newImageUrls.length > 0) {
+      await supabase.from("product_images").delete().eq("product_id", id);
+      for (let i = 0; i < newImageUrls.length; i++) {
+        await supabase.from("product_images").insert({
+          product_id: id,
+          image_url: newImageUrls[i],
+          storage_path: newImageUrls[i],
+          sort_order: i + 1,
+        });
+      }
     }
 
     return NextResponse.json({ success: true, message: "Product updated", product: updated }, { headers: corsHeaders() });

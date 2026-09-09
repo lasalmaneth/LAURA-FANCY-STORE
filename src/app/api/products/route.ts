@@ -26,9 +26,10 @@ export async function GET(request: Request) {
     const { data, error } = await query;
     if (error) return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders() });
 
-    // Format products with main image for backward compatibility
+    // Format products with main image and category for backward compatibility
     const formatted = (data || []).map((p: any) => ({
       ...p,
+      category: p.categories || null,
       image: p.images?.[0]?.image_url || null,
     }));
 
