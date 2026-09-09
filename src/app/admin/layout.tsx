@@ -3,15 +3,21 @@ import { logout } from "@/actions/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUserAdmin } from "@/lib/admin";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+    user = data?.user || null;
+  } catch (err) {
+    console.error("Admin layout auth check error:", err);
+  }
 
   const userIsAdmin = isUserAdmin(user);
 

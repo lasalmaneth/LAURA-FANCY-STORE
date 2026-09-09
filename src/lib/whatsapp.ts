@@ -11,7 +11,10 @@ export function generateWhatsAppLink({
   productCode,
   productUrl,
 }: WhatsAppInquiryParams): string {
-  const rawNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '94773223040';
+  let rawNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '94773223040';
+  if (!rawNumber || rawNumber.includes('752808963')) {
+    rawNumber = '94773223040';
+  }
   const cleanNumber = rawNumber.replace(/[^0-9]/g, '');
 
   let message = `Hi, I'm interested in this product.\n`;
