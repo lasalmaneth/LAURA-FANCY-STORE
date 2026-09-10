@@ -75,21 +75,26 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       active = body.active !== false;
     }
 
+    const updatePayload: Record<string, any> = {
+      name,
+      description,
+      short_description,
+      price,
+      category_id,
+      product_code,
+      stock_status,
+      featured,
+      active,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (slug && slug.trim()) {
+      updatePayload.slug = slug.trim();
+    }
+
     const { data: updated, error: updateErr } = await supabase
       .from("products")
-      .update({
-        name,
-        slug,
-        description,
-        short_description,
-        price,
-        category_id,
-        product_code,
-        stock_status,
-        featured,
-        active,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq("id", id)
       .select()
       .single();

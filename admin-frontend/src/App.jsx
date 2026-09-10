@@ -360,6 +360,11 @@ export default function App() {
     formData.append("active", productForm.active);
     formData.append("short_description", productForm.short_description);
     formData.append("description", productForm.description);
+    if (editingProduct?.slug) {
+      formData.append("slug", editingProduct.slug);
+    } else if (productForm.name) {
+      formData.append("slug", productForm.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
+    }
 
     imageSlots.forEach((s) => {
       if (s.file) {
