@@ -44,26 +44,59 @@ export async function POST(request: Request) {
         if (!isNaN(pVal)) priority_order = pVal;
       }
 
-      // Process uploaded files into Supabase Storage
-      const files: File[] = [];
-      formData.forEach((value, key) => {
-        if ((key === "images" || key === "image" || key.startsWith("image_") || key.startsWith("image")) && value instanceof File && value.size > 0) {
-          files.push(value);
+      // Slot-based image processing for up to 4 images
+      const slotImageMap: { [slot: number]: string } = {};
+
+      for (let slot = 1; slot <= 4; slot++) {
+        const fileKey = `image_${slot}`;
+        const file = formData.get(fileKey);
+        const existingUrl = (formData.get(`existing_image_${slot}`) as string)?.trim();
+        const isCleared = formData.get(`clear_image_${slot}`) === "true";
+
+        if (file instanceof File && file.size > 0) {
+          const fileExt = file.name.split(".").pop() || "jpg";
+          const fileName = `prod-${Date.now()}-${slot}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+          const buffer = await file.arrayBuffer();
+
+          const { error: uploadErr } = await supabase.storage
+            .from("products")
+            .upload(fileName, buffer, { contentType: file.type || "image/jpeg", upsert: true });
+
+          if (!uploadErr) {
+            const { data: publicData } = supabase.storage.from("products").getPublicUrl(fileName);
+            if (publicData?.publicUrl) {
+              slotImageMap[slot] = publicData.publicUrl;
+              uploadedImageUrls.push(publicData.publicUrl);
+            }
+          }
+        } else if (!isCleared && existingUrl) {
+          slotImageMap[slot] = existingUrl;
+          uploadedImageUrls.push(existingUrl);
         }
-      });
+      }
 
-      for (const file of files) {
-        const fileExt = file.name.split(".").pop() || "jpg";
-        const fileName = `prod-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-        const buffer = await file.arrayBuffer();
-
-        const { error: uploadErr } = await supabase.storage
-          .from("products")
-          .upload(fileName, buffer, { contentType: file.type, upsert: true });
-
-        if (!uploadErr) {
-          const { data: publicData } = supabase.storage.from("products").getPublicUrl(fileName);
-          if (publicData?.publicUrl) uploadedImageUrls.push(publicData.publicUrl);
+      // Fallback for generic file input
+      if (Object.keys(slotImageMap).length === 0) {
+        const legacyFiles: File[] = [];
+        formData.forEach((value, key) => {
+          if ((key === "images" || key === "image") && value instanceof File && value.size > 0) {
+            legacyFiles.push(value);
+          }
+        });
+        for (let i = 0; i < legacyFiles.length; i++) {
+          const file = legacyFiles[i];
+          const fileExt = file.name.split(".").pop() || "jpg";
+          const fileName = `prod-${Date.now()}-${i + 1}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+          const buffer = await file.arrayBuffer();
+          const { error: uploadErr } = await supabase.storage
+            .from("products")
+            .upload(fileName, buffer, { contentType: file.type || "image/jpeg", upsert: true });
+          if (!uploadErr) {
+            const { data: publicData } = supabase.storage.from("products").getPublicUrl(fileName);
+            if (publicData?.publicUrl) {
+              uploadedImageUrls.push(publicData.publicUrl);
+            }
+          }
         }
       }
     } else {

@@ -63,6 +63,7 @@ export default function App() {
     description: "",
     imageFile: null,
   });
+  const [productSaving, setProductSaving] = useState(false);
 
   const [notice, setNotice] = useState({
     notice_text: "Buy 3500 or more and get Free Delivery !!! .... hurry up limited time only ....",
@@ -345,38 +346,95 @@ export default function App() {
     setShowProductModal(true);
   };
 
+  const compressImageFile = async (file, maxWidth = 1280, maxHeight = 1280, quality = 0.82) => {
+    if (!file || !file.type || !file.type.startsWith("image/")) return file;
+    // Skip small images already under 300KB
+    if (file.size < 300 * 1024) return file;
+
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                resolve(file);
+                return;
+              }
+              const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), {
+                type: "image/jpeg",
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            },
+            "image/jpeg",
+            quality
+          );
+        };
+        img.onerror = () => resolve(file);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleProductSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("name", productForm.name);
-    formData.append("price", productForm.price);
-    formData.append("original_price", productForm.original_price || "");
-    formData.append("discount_percentage", productForm.discount_percentage || 0);
-    formData.append("category_id", productForm.category_id);
-    formData.append("product_code", productForm.product_code);
-    formData.append("priority_order", productForm.priority_order !== undefined ? productForm.priority_order : 0);
-    formData.append("stock_status", productForm.stock_status);
-    formData.append("featured", productForm.featured);
-    formData.append("active", productForm.active);
-    formData.append("short_description", productForm.short_description);
-    formData.append("description", productForm.description);
-    if (editingProduct?.slug) {
-      formData.append("slug", editingProduct.slug);
-    } else if (productForm.name) {
-      formData.append("slug", productForm.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
-    }
-
-    imageSlots.forEach((s) => {
-      if (s.file) {
-        formData.append(`image_${s.slot}`, s.file);
-      } else if (s.cleared) {
-        formData.append(`clear_image_${s.slot}`, "true");
-      } else if (s.existingUrl) {
-        formData.append(`existing_image_${s.slot}`, s.existingUrl);
-      }
-    });
+    if (productSaving) return;
+    setProductSaving(true);
 
     try {
+      const formData = new FormData();
+      formData.append("name", productForm.name);
+      formData.append("price", productForm.price);
+      formData.append("original_price", productForm.original_price || "");
+      formData.append("discount_percentage", productForm.discount_percentage || 0);
+      formData.append("category_id", productForm.category_id);
+      formData.append("product_code", productForm.product_code);
+      formData.append("priority_order", productForm.priority_order !== undefined ? productForm.priority_order : 0);
+      formData.append("stock_status", productForm.stock_status);
+      formData.append("featured", productForm.featured);
+      formData.append("active", productForm.active);
+      formData.append("short_description", productForm.short_description);
+      formData.append("description", productForm.description);
+      if (editingProduct?.slug) {
+        formData.append("slug", editingProduct.slug);
+      } else if (productForm.name) {
+        formData.append("slug", productForm.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
+      }
+
+      for (const s of imageSlots) {
+        if (s.file) {
+          const optimizedFile = await compressImageFile(s.file);
+          formData.append(`image_${s.slot}`, optimizedFile);
+        } else if (s.cleared) {
+          formData.append(`clear_image_${s.slot}`, "true");
+        } else if (s.existingUrl) {
+          formData.append(`existing_image_${s.slot}`, s.existingUrl);
+        }
+      }
+
       if (editingProduct) {
         await api.updateProduct(editingProduct.id, formData);
         setFeedback({ type: "success", message: `Updated product "${productForm.name}" successfully!` });
@@ -387,7 +445,13 @@ export default function App() {
       setShowProductModal(false);
       loadAllData();
     } catch (err) {
-      alert("Error saving product: " + err.message);
+      if (err.message && err.message.toLowerCase().includes("failed to fetch")) {
+        alert("Upload error: Could not reach the server. Images are now auto-compressed, please try clicking Save Changes again.");
+      } else {
+        alert("Error saving product: " + err.message);
+      }
+    } finally {
+      setProductSaving(false);
     }
   };
 
@@ -1581,8 +1645,8 @@ export default function App() {
                 <button type="button" className="btn btn-secondary" onClick={() => setShowProductModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingProduct ? "Save Changes" : "Create Product"}
+                <button type="submit" className="btn btn-primary" disabled={productSaving}>
+                  {productSaving ? "Optimizing & Saving..." : (editingProduct ? "Save Changes" : "Create Product")}
                 </button>
               </div>
             </form>

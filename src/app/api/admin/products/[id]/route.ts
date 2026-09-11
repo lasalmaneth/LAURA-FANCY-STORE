@@ -26,9 +26,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     let featured = false;
     let active = true;
     let priority_order: number | null = null;
-    const newImageUrls: string[] = [];
+    const slotImageMap: { [slot: number]: string } = {};
+    let hasMultipartImages = false;
 
     if (contentType.includes("multipart/form-data")) {
+      hasMultipartImages = true;
       const formData = await request.formData();
       name = (formData.get("name") as string) || "";
       slug = (formData.get("slug") as string) || "";
@@ -45,25 +47,52 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         if (!isNaN(pVal)) priority_order = pVal;
       }
 
-      const files: File[] = [];
-      formData.forEach((value, key) => {
-        if ((key === "images" || key === "image" || key.startsWith("image_") || key.startsWith("image")) && value instanceof File && value.size > 0) {
-          files.push(value);
+      // Slot-based image processing for up to 4 images
+
+      for (let slot = 1; slot <= 4; slot++) {
+        const fileKey = `image_${slot}`;
+        const file = formData.get(fileKey);
+        const existingUrl = (formData.get(`existing_image_${slot}`) as string)?.trim();
+        const isCleared = formData.get(`clear_image_${slot}`) === "true";
+
+        if (file instanceof File && file.size > 0) {
+          const fileExt = file.name.split(".").pop() || "jpg";
+          const fileName = `prod-${Date.now()}-${slot}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+          const buffer = await file.arrayBuffer();
+
+          const { error: uploadErr } = await supabase.storage
+            .from("products")
+            .upload(fileName, buffer, { contentType: file.type || "image/jpeg", upsert: true });
+
+          if (!uploadErr) {
+            const { data: publicData } = supabase.storage.from("products").getPublicUrl(fileName);
+            if (publicData?.publicUrl) slotImageMap[slot] = publicData.publicUrl;
+          }
+        } else if (!isCleared && existingUrl) {
+          slotImageMap[slot] = existingUrl;
         }
-      });
+      }
 
-      for (const file of files) {
-        const fileExt = file.name.split(".").pop() || "jpg";
-        const fileName = `prod-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-        const buffer = await file.arrayBuffer();
-
-        const { error: uploadErr } = await supabase.storage
-          .from("products")
-          .upload(fileName, buffer, { contentType: file.type, upsert: true });
-
-        if (!uploadErr) {
-          const { data: publicData } = supabase.storage.from("products").getPublicUrl(fileName);
-          if (publicData?.publicUrl) newImageUrls.push(publicData.publicUrl);
+      // Check fallback if formData had generic 'images' or 'image' files without slots
+      if (Object.keys(slotImageMap).length === 0) {
+        const legacyFiles: File[] = [];
+        formData.forEach((value, key) => {
+          if ((key === "images" || key === "image") && value instanceof File && value.size > 0) {
+            legacyFiles.push(value);
+          }
+        });
+        for (let i = 0; i < legacyFiles.length; i++) {
+          const file = legacyFiles[i];
+          const fileExt = file.name.split(".").pop() || "jpg";
+          const fileName = `prod-${Date.now()}-${i + 1}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+          const buffer = await file.arrayBuffer();
+          const { error: uploadErr } = await supabase.storage
+            .from("products")
+            .upload(fileName, buffer, { contentType: file.type || "image/jpeg", upsert: true });
+          if (!uploadErr) {
+            const { data: publicData } = supabase.storage.from("products").getPublicUrl(fileName);
+            if (publicData?.publicUrl) slotImageMap[i + 1] = publicData.publicUrl;
+          }
         }
       }
     } else {
@@ -126,15 +155,20 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500, headers: corsHeaders() });
 
-    if (newImageUrls.length > 0) {
+    if (hasMultipartImages && Object.keys(slotImageMap).length > 0) {
       await supabase.from("product_images").delete().eq("product_id", id);
-      for (let i = 0; i < newImageUrls.length; i++) {
-        await supabase.from("product_images").insert({
-          product_id: id,
-          image_url: newImageUrls[i],
-          storage_path: newImageUrls[i],
-          sort_order: i + 1,
-        });
+      const sortedSlots = Object.keys(slotImageMap).map(Number).sort((a, b) => a - b);
+      for (let i = 0; i < sortedSlots.length; i++) {
+        const slot = sortedSlots[i];
+        const url = slotImageMap[slot];
+        if (url) {
+          await supabase.from("product_images").insert({
+            product_id: id,
+            image_url: url,
+            storage_path: url,
+            sort_order: i + 1,
+          });
+        }
       }
     }
 
