@@ -25,6 +25,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     let stock_status = "in_stock";
     let featured = false;
     let active = true;
+    let priority_order: number | null = null;
     const newImageUrls: string[] = [];
 
     if (contentType.includes("multipart/form-data")) {
@@ -39,6 +40,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       stock_status = (formData.get("stock_status") as string) || "in_stock";
       featured = formData.get("featured") === "true" || formData.get("featured") === "1";
       active = formData.get("active") !== "false" && formData.get("active") !== "0";
+      if (formData.has("priority_order")) {
+        const pVal = parseInt(formData.get("priority_order") as string, 10);
+        if (!isNaN(pVal)) priority_order = pVal;
+      }
 
       const files: File[] = [];
       formData.forEach((value, key) => {
@@ -73,6 +78,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       stock_status = body.stock_status || "in_stock";
       featured = Boolean(body.featured);
       active = body.active !== false;
+      if (body.priority_order !== undefined && body.priority_order !== null) {
+        const pNum = parseInt(body.priority_order, 10);
+        if (!isNaN(pNum)) priority_order = pNum;
+      }
     }
 
     const updatePayload: Record<string, any> = {
@@ -92,12 +101,28 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       updatePayload.slug = slug.trim();
     }
 
-    const { data: updated, error: updateErr } = await supabase
+    if (priority_order !== null) {
+      updatePayload.priority_order = priority_order;
+    }
+
+    let { data: updated, error: updateErr } = await supabase
       .from("products")
       .update(updatePayload)
       .eq("id", id)
       .select()
       .single();
+
+    if (updateErr && updateErr.message?.includes("priority_order")) {
+      delete updatePayload.priority_order;
+      const retry = await supabase
+        .from("products")
+        .update(updatePayload)
+        .eq("id", id)
+        .select()
+        .single();
+      updated = retry.data;
+      updateErr = retry.error;
+    }
 
     if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500, headers: corsHeaders() });
 

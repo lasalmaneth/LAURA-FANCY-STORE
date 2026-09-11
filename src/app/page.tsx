@@ -19,6 +19,7 @@ export default async function HomePage() {
       .select("*, categories(*), images:product_images(*)")
       .eq("active", true)
       .eq("featured", true)
+      .order("priority_order", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false });
 
     if (!error && Array.isArray(data) && data.length > 0) {

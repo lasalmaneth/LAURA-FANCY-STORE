@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
   product_code TEXT DEFAULT '',
   stock_status TEXT NOT NULL DEFAULT 'in_stock' CHECK (stock_status IN ('in_stock', 'out_of_stock', 'coming_soon')),
+  priority_order INT DEFAULT 0,
   featured BOOLEAN DEFAULT false NOT NULL,
   active BOOLEAN DEFAULT true NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL,

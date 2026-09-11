@@ -24,6 +24,7 @@ export async function POST(request: Request) {
     let stock_status = "in_stock";
     let featured = false;
     let active = true;
+    let priority_order = 0;
     const uploadedImageUrls: string[] = [];
 
     if (contentType.includes("multipart/form-data")) {
@@ -38,6 +39,10 @@ export async function POST(request: Request) {
       stock_status = (formData.get("stock_status") as string) || "in_stock";
       featured = formData.get("featured") === "true" || formData.get("featured") === "1";
       active = formData.get("active") !== "false" && formData.get("active") !== "0";
+      if (formData.has("priority_order")) {
+        const pVal = parseInt(formData.get("priority_order") as string, 10);
+        if (!isNaN(pVal)) priority_order = pVal;
+      }
 
       // Process uploaded files into Supabase Storage
       const files: File[] = [];
@@ -73,28 +78,49 @@ export async function POST(request: Request) {
       stock_status = body.stock_status || "in_stock";
       featured = Boolean(body.featured);
       active = body.active !== false;
+      if (body.priority_order !== undefined && body.priority_order !== null) {
+        const pNum = parseInt(body.priority_order, 10);
+        if (!isNaN(pNum)) priority_order = pNum;
+      }
       if (body.image) uploadedImageUrls.push(body.image);
     }
 
     if (!name) return NextResponse.json({ error: "Product name is required" }, { status: 400, headers: corsHeaders() });
     const finalSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now().toString().slice(-4);
 
-    const { data: product, error: insertErr } = await supabase
+    const insertPayload: Record<string, any> = {
+      name,
+      slug: finalSlug,
+      description,
+      short_description,
+      price,
+      category_id,
+      product_code,
+      stock_status,
+      featured,
+      active,
+    };
+
+    if (priority_order > 0) {
+      insertPayload.priority_order = priority_order;
+    }
+
+    let { data: product, error: insertErr } = await supabase
       .from("products")
-      .insert({
-        name,
-        slug: finalSlug,
-        description,
-        short_description,
-        price,
-        category_id,
-        product_code,
-        stock_status,
-        featured,
-        active,
-      })
+      .insert(insertPayload)
       .select()
       .single();
+
+    if (insertErr && insertErr.message?.includes("priority_order")) {
+      delete insertPayload.priority_order;
+      const retry = await supabase
+        .from("products")
+        .insert(insertPayload)
+        .select()
+        .single();
+      product = retry.data;
+      insertErr = retry.error;
+    }
 
     if (insertErr) {
       return NextResponse.json({ error: insertErr.message }, { status: 500, headers: corsHeaders() });

@@ -129,6 +129,7 @@ export default async function ProductsCatalogPage({
         .from("products")
         .select("*, categories(*), images:product_images(*)")
         .eq("active", true)
+        .order("priority_order", { ascending: true, nullsFirst: false })
         .order("created_at", { ascending: false }),
       supabase.from("categories").select("*").order("name", { ascending: true }),
     ]);

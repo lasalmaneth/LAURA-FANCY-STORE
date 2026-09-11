@@ -17,6 +17,7 @@ export async function GET(request: Request) {
     let query = supabase
       .from("products")
       .select("*, categories(*), images:product_images(*)")
+      .order("priority_order", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false });
 
     if (activeOnly) query = query.eq("active", true);
